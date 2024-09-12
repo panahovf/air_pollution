@@ -64,7 +64,7 @@ del directory
 # --------------
 # LOAD FRACTIONAL CONTRIBUTION DATA
 
-# 1 --- get lat & lon row indexes first
+# STEP 1 --- get lat & lon row indexes first
 
 # set indeces of the data that correspond to Poland
 # https://worldpopulationreview.com/countries/poland/location
@@ -95,7 +95,7 @@ for chunk in pd.read_csv(file_path, chunksize=chunk_size):
 
     
 # Save indices to a JSON file --- to keep the record
-with open("2 - output/script 1.1/indices.json", "w") as f:
+with open("2 - output/script 1.1 - fractional contribution levels - raw data/indices.json", "w") as f:
     json.dump(indices, f)
 
 

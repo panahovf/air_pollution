@@ -64,7 +64,7 @@ del directory
 # --------------
 # LOAD FRACTIONAL CONTRIBUTION DATA
 df_frac_contribution = pd.read_csv('1 - input/1 - fractional contribution/fractional contribution - poland.csv')
-
+df_frac_contribution_ind = pd.read_csv('2 - output/script 1.2 - fractional contribution levels - raw data/combined_ind.csv')
 
 
 
@@ -209,6 +209,31 @@ del df_population1, df_population2, df_population3, df_population4
 
 
 
+# In[]: COMBINE FRACTIONAL CONTRIBUTION FILES
+#####################################
+
+# merge the 2 files:
+    # first file contains power related contribution factors (ENEcoal and ENEother) --- used for power emissions
+    # second file contain industry related contribution factors (INDcoal and INDother) --- used for extraction emissions --- needs to be confirmed
+
+df_frac_contribution = pd.merge(
+    df_frac_contribution,
+    df_frac_contribution_ind[['Lat', 'Lon', 'INDcoal', 'INDother']],  # Include 'Lat' and 'Lon' here
+    on=['Lat', 'Lon'],
+    how='left'
+)
+
+del df_frac_contribution_ind
+
+
+
+
+
+
+
+
+
+
 # In[4]: GET EMISSIONS REDUCTION SHARE UNDER NZ SCENARIO
 #####################################
 
@@ -255,6 +280,9 @@ df_nz_extraction = pd.concat([df_nz_extraction, temp], ignore_index=True)   # Ap
 df_nz_extraction = df_nz_extraction[~df_nz_extraction['fuel_type'].isin(['Oil', 'Gas'])]   # Remove the original 'oil' and 'gas' rows
 
 del temp
+
+
+
 
 
 # --------------
@@ -326,6 +354,13 @@ df_concentration_cp = df_concentration_cp.drop(columns=['X', 'Y', 'Unnamed: 0', 
 df_concentration_cp.rename(columns={'field_3': 'Current_level'}, inplace=True)
 
 
+# MAX
+df_concentration_max = pd.merge(df_frac_contribution, df_concentration_baseline[['X', 'Y', 'field_3']],
+                     left_on=['lat2', 'lon2'], right_on=['Y', 'X'], how='left')
+
+df_concentration_max = df_concentration_max.drop(columns=['X', 'Y', 'Unnamed: 0', 'Lon', 'Lat'])
+df_concentration_max.rename(columns={'field_3': 'Current_level'}, inplace=True)
+
 # delete
 del df_concentration_baseline, df_frac_contribution
 
@@ -342,6 +377,8 @@ del df_concentration_baseline, df_frac_contribution
 ##################################
 
 # iterate over each year to get concentration statistics
+
+
 
 # --------------
 # NZ
@@ -372,24 +409,26 @@ for year in year_columns:
         )
     
     df_concentration_nz_coal_extraction[new_column_name] = df_concentration_nz['Current_level'] - df_concentration_nz['Current_level'] * (
-        df_concentration_nz['ENEcoal'] * df_nz_extraction_reduction[df_nz_extraction_reduction['fuel_type'] == 'Coal'][year].values[0]
+        df_concentration_nz['INDcoal'] * df_nz_extraction_reduction[df_nz_extraction_reduction['fuel_type'] == 'Coal'][year].values[0]
         ) ### this needs to be changed if coal emissions contribution type is decided to be different from ENE (eg: INDcoal)
     
     df_concentration_nz_oilgas_extraction[new_column_name] = df_concentration_nz['Current_level'] - df_concentration_nz['Current_level'] * (
-        df_concentration_nz['ENEother'] * df_nz_extraction_reduction[df_nz_extraction_reduction['fuel_type'] == 'O&G'][year].values[0]
+        df_concentration_nz['INDother'] * df_nz_extraction_reduction[df_nz_extraction_reduction['fuel_type'] == 'O&G'][year].values[0]
         ) ### this needs to be changed if coal emissions contribution type is decided to be different from ENE (eg: INDcoal)
-    
+
     # this is for total change in concentration across all fossil fuel types --- CHANGE "ENE" to a different type if needed
     df_concentration_nz_total[new_column_name] = df_concentration_nz['Current_level'] - df_concentration_nz['Current_level'] * (
         df_concentration_nz['ENEcoal'] * df_nz_power_reduction[df_nz_power_reduction['fuel_type'] == 'Coal'][year].values[0] + 
         df_concentration_nz['ENEother'] * df_nz_power_reduction[df_nz_power_reduction['fuel_type'] == 'O&G'][year].values[0] +
-        df_concentration_nz['ENEcoal'] * df_nz_extraction_reduction[df_nz_extraction_reduction['fuel_type'] == 'Coal'][year].values[0] + 
-        df_concentration_nz['ENEother'] * df_nz_extraction_reduction[df_nz_extraction_reduction['fuel_type'] == 'O&G'][year].values[0]
+        df_concentration_nz['INDcoal'] * df_nz_extraction_reduction[df_nz_extraction_reduction['fuel_type'] == 'Coal'][year].values[0] + 
+        df_concentration_nz['INDother'] * df_nz_extraction_reduction[df_nz_extraction_reduction['fuel_type'] == 'O&G'][year].values[0]
         )
 
 del new_column_name, year
 
                  
+
+
 
 # --------------
 # CP
@@ -420,23 +459,63 @@ for year in year_columns:
         )
     
     df_concentration_cp_coal_extraction[new_column_name] = df_concentration_cp['Current_level'] - df_concentration_cp['Current_level'] * (
-        df_concentration_cp['ENEcoal'] * df_cp_extraction_reduction[df_cp_extraction_reduction['fuel_type'] == 'Coal'][year].values[0]
+        df_concentration_cp['INDcoal'] * df_cp_extraction_reduction[df_cp_extraction_reduction['fuel_type'] == 'Coal'][year].values[0]
         ) ### this needs to be changed if coal emissions contribution type is decided to be different from ENE (eg: INDcoal)
     
     df_concentration_cp_oilgas_extraction[new_column_name] = df_concentration_cp['Current_level'] - df_concentration_cp['Current_level'] * (
-        df_concentration_cp['ENEother'] * df_cp_extraction_reduction[df_cp_extraction_reduction['fuel_type'] == 'O&G'][year].values[0]
+        df_concentration_cp['INDother'] * df_cp_extraction_reduction[df_cp_extraction_reduction['fuel_type'] == 'O&G'][year].values[0]
         ) ### this needs to be changed if coal emissions contribution type is decided to be different from ENE (eg: INDcoal)
-    
+
     # this is for total change in concentration across all fossil fuel types --- CHANGE "ENE" to a different type if needed
     df_concentration_cp_total[new_column_name] = df_concentration_cp['Current_level'] - df_concentration_cp['Current_level'] * (
         df_concentration_cp['ENEcoal'] * df_cp_power_reduction[df_cp_power_reduction['fuel_type'] == 'Coal'][year].values[0] + 
         df_concentration_cp['ENEother'] * df_cp_power_reduction[df_cp_power_reduction['fuel_type'] == 'O&G'][year].values[0] +
-        df_concentration_cp['ENEcoal'] * df_cp_extraction_reduction[df_cp_extraction_reduction['fuel_type'] == 'Coal'][year].values[0] + 
-        df_concentration_cp['ENEother'] * df_cp_extraction_reduction[df_cp_extraction_reduction['fuel_type'] == 'O&G'][year].values[0]
+        df_concentration_cp['INDcoal'] * df_cp_extraction_reduction[df_cp_extraction_reduction['fuel_type'] == 'Coal'][year].values[0] + 
+        df_concentration_cp['INDother'] * df_cp_extraction_reduction[df_cp_extraction_reduction['fuel_type'] == 'O&G'][year].values[0]
         )
 
 del new_column_name, year
 
+
+
+
+
+# --------------
+# MAX
+
+# remove extreme values that represent 'no data'
+df_concentration_max = df_concentration_max[df_concentration_max['Current_level'] > 0]
+             
+
+# create dataframes with reduction for each fuel type individually
+df_concentration_max_coal_power = df_concentration_max.copy()
+df_concentration_max_coal_extraction = df_concentration_max.copy()
+df_concentration_max_oilgas_power = df_concentration_max.copy()
+df_concentration_max_oilgas_extraction = df_concentration_max.copy()
+df_concentration_max_total = df_concentration_max.copy()
+
+
+# get reduction shares
+for year in year_columns:
+    
+    new_column_name = f'MX_{year}'
+
+    df_concentration_max_coal_power[new_column_name] = df_concentration_max['Current_level'] * (1 - df_concentration_max['ENEcoal'])
+    
+    df_concentration_max_oilgas_power[new_column_name] = df_concentration_max['Current_level'] * (1 - df_concentration_max['ENEother'])
+       
+    df_concentration_max_coal_extraction[new_column_name] = df_concentration_max['Current_level'] * (1 - df_concentration_max['INDcoal']) ### this needs to be changed if coal emissions contribution type is decided to be different from ENE (eg: INDcoal)
+    
+    df_concentration_max_oilgas_extraction[new_column_name] = df_concentration_max['Current_level'] * (1 - df_concentration_max['INDother']) ### this needs to be changed if coal emissions contribution type is decided to be different from ENE (eg: INDcoal)
+        
+    # this is for total change in concentration across all fossil fuel types --- CHANGE "ENE" to a different type if needed
+    df_concentration_max_total[new_column_name] = df_concentration_max['Current_level'] * (1 -  df_concentration_max['ENEcoal'] -   # coal power
+                                                                                          df_concentration_max['ENEother'] -   # oilgas power
+                                                                                          df_concentration_max['INDcoal'] -   # coal extraction
+                                                                                          df_concentration_max['INDother']   # oilgas extraction
+                                                                                          )
+
+del new_column_name, year
 
 
 
@@ -502,6 +581,11 @@ df_concentration_cp_oilgas_power = pd.merge(df_concentration_cp_oilgas_power, df
 df_concentration_cp_oilgas_extraction = pd.merge(df_concentration_cp_oilgas_extraction, df_population, on=['lat2', 'lon2'], how='inner')
 df_concentration_cp_total = pd.merge(df_concentration_cp_total, df_population, on=['lat2', 'lon2'], how='inner')
 
+df_concentration_max_coal_power = pd.merge(df_concentration_max_coal_power, df_population, on=['lat2', 'lon2'], how='inner')
+df_concentration_max_coal_extraction = pd.merge(df_concentration_max_coal_extraction, df_population, on=['lat2', 'lon2'], how='inner')
+df_concentration_max_oilgas_power = pd.merge(df_concentration_max_oilgas_power, df_population, on=['lat2', 'lon2'], how='inner')
+df_concentration_max_oilgas_extraction = pd.merge(df_concentration_max_oilgas_extraction, df_population, on=['lat2', 'lon2'], how='inner')
+df_concentration_max_total = pd.merge(df_concentration_max_total, df_population, on=['lat2', 'lon2'], how='inner')
 
 # check sum total of population
 print(df_concentration_nz_coal_power['population'].sum())
@@ -517,6 +601,7 @@ print(df_concentration_nz_coal_power['population'].sum())
 # Identify the year columns
 year_columns_nz = [f'NZ_{year}' for year in range(2024, 2051)]  # Adjust the range as necessary
 year_columns_cp = [f'CP_{year}' for year in range(2024, 2051)]  # Adjust the range as necessary
+year_columns_max = [f'MX_{year}' for year in range(2024, 2051)]  # Adjust the range as necessary
 
 
 # total population
@@ -542,6 +627,7 @@ for year in year_columns_nz:
     temp_power_oilgas[year] = temp_power_oilgas[year].multiply(temp_power_oilgas['population'], axis=0).div(var_total_population)
     temp_extraction_oilgas[year] = temp_extraction_oilgas[year].multiply(temp_extraction_oilgas['population'], axis=0).div(var_total_population)
     temp_total[year] = temp_total[year].multiply(temp_total['population'], axis=0).div(var_total_population)
+
 
 
 # Sum across all grid cells and combine fuel types into single dataframe
@@ -611,6 +697,52 @@ df_concentration_cp_annual['Year'] = df_concentration_cp_annual['Year'].str.repl
 
 
 
+
+
+# --------------
+# MAX
+
+# concentration X population in that grid    /   total population
+# first create temp files
+temp_power_coal = df_concentration_max_coal_power.copy()
+temp_power_oilgas = df_concentration_max_oilgas_power.copy()
+temp_extraction_coal = df_concentration_max_coal_extraction.copy()
+temp_extraction_oilgas = df_concentration_max_oilgas_extraction.copy()
+temp_total = df_concentration_max_total.copy()
+
+
+# concentration X population in that grid    /   total population
+for year in year_columns_max:
+    temp_power_coal[year] = temp_power_coal[year].multiply(temp_power_coal['population'], axis=0).div(var_total_population)
+    temp_extraction_coal[year] = temp_extraction_coal[year].multiply(temp_extraction_coal['population'], axis=0).div(var_total_population)
+    temp_power_oilgas[year] = temp_power_oilgas[year].multiply(temp_power_oilgas['population'], axis=0).div(var_total_population)
+    temp_extraction_oilgas[year] = temp_extraction_oilgas[year].multiply(temp_extraction_oilgas['population'], axis=0).div(var_total_population)
+    temp_total[year] = temp_total[year].multiply(temp_total['population'], axis=0).div(var_total_population)
+
+
+# Sum across all grid cells and combine fuel types into single dataframe
+temp_power_coal = temp_power_coal[year_columns_max].sum(axis=0)
+temp_power_oilgas = temp_power_oilgas[year_columns_max].sum(axis=0)
+temp_extraction_coal = temp_extraction_coal[year_columns_max].sum(axis=0)
+temp_extraction_oilgas = temp_extraction_oilgas[year_columns_max].sum(axis=0)
+temp_total = temp_total[year_columns_max].sum(axis=0)
+
+df_concentration_max_annual = pd.DataFrame({
+    'power_coal': temp_power_coal,
+    'power_oilgas': temp_power_oilgas,
+    'extraction_coal': temp_extraction_coal,
+    'extraction_oilgas': temp_extraction_oilgas,
+    'total_fossil': temp_total
+})
+
+df_concentration_max_annual = df_concentration_max_annual.reset_index()
+df_concentration_max_annual.rename(columns={'index': 'Year'}, inplace=True)
+df_concentration_max_annual['Year'] = df_concentration_max_annual['Year'].str.replace('MX_', '')
+
+
+
+
+
 # delete
 del year, var_total_population, year_columns_nz, year_columns_cp
 del temp_extraction_coal, temp_extraction_oilgas, temp_power_coal, temp_power_oilgas, temp_total
@@ -632,10 +764,11 @@ del temp_extraction_coal, temp_extraction_oilgas, temp_power_coal, temp_power_oi
 # annual concentration levels
 df_concentration_cp_annual.to_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario/1.1 - annual concentration levels - current policy.xlsx', index = False)
 df_concentration_nz_annual.to_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario/1.2 - annual concentration levels - netzero 1.5C 50% adjsuted.xlsx', index = False)
+df_concentration_max_annual.to_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario/1.3 - annual concentration levels - full shut down.xlsx', index = False)
 
 
 # --------------
-# annual concentration levels --- by fuel type
+# annual concentration levels --- by fuel type --- CP
 df_concentration_cp_coal_power.to_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario/2.1 - annual concentration levels - current policy - coal - power.xlsx', index = False)
 df_concentration_cp_coal_extraction.to_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario/2.2 - annual concentration levels - current policy - coal - extraction.xlsx', index = False)
 df_concentration_cp_oilgas_power.to_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario/2.3 - annual concentration levels - current policy - oilgas - power.xlsx', index = False)
@@ -644,24 +777,33 @@ df_concentration_cp_total.to_excel('2 - output/script 2.1 - air pollution concen
 
 
 # --------------
-# annual concentration levels --- by fuel type
+# annual concentration levels --- by fuel type --- NZ
 df_concentration_nz_coal_power.to_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario/3.1 - annual concentration levels - netzero 1.5C 50% adjsuted - coal - power.xlsx', index = False)
 df_concentration_nz_coal_extraction.to_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario/3.2 - annual concentration levels - netzero 1.5C 50% adjsuted - coal - extraction.xlsx', index = False)
 df_concentration_nz_oilgas_power.to_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario/3.3 - annual concentration levels - netzero 1.5C 50% adjsuted - oilgas - power.xlsx', index = False)
 df_concentration_nz_oilgas_extraction.to_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario/3.4 - annual concentration levels - netzero 1.5C 50% adjsuted - oilgas - extraction.xlsx', index = False)
-df_concentration_nz_total.to_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario/2.5 - annual concentration levels - netzero 1.5C 50% adjsuted - total fossil.xlsx', index = False)
+df_concentration_nz_total.to_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario/3.5 - annual concentration levels - netzero 1.5C 50% adjsuted - total fossil.xlsx', index = False)
+
+
+# --------------
+# annual concentration levels --- by fuel type --- MAX
+df_concentration_max_coal_power.to_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario/4.1 - annual concentration levels - full shut down - coal - power.xlsx', index = False)
+df_concentration_max_coal_extraction.to_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario/4.2 - annual concentration levels - full shut down - coal - extraction.xlsx', index = False)
+df_concentration_max_oilgas_power.to_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario/4.3 - annual concentration levels - full shut down - oilgas - power.xlsx', index = False)
+df_concentration_max_oilgas_extraction.to_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario/4.4 - annual concentration levels - full shut down - oilgas - extraction.xlsx', index = False)
+df_concentration_max_total.to_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario/4.5 - annual concentration levels - full shut down - total fossil.xlsx', index = False)
 
 
 # --------------
 # emissions changes by type
-df_cp_power_reduction.to_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario/4.1 - emissions vs base year - current policy -  power.xlsx', index = False)
-df_cp_extraction_reduction.to_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario/4.2 - emissions vs base year - current policy -  extraction.xlsx', index = False)
-df_nz_power_reduction.to_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario/4.3 - emissions vs base year - netzero 1.5C 50% adjsuted -  power.xlsx', index = False)
-df_nz_extraction_reduction.to_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario/4.4 - emissions vs base year - netzero 1.5C 50% adjsuted -  extraction.xlsx', index = False)
+df_cp_power_reduction.to_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario/5.1 - emissions vs base year - current policy -  power.xlsx', index = False)
+df_cp_extraction_reduction.to_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario/5.2 - emissions vs base year - current policy -  extraction.xlsx', index = False)
+df_nz_power_reduction.to_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario/5.3 - emissions vs base year - netzero 1.5C 50% adjsuted -  power.xlsx', index = False)
+df_nz_extraction_reduction.to_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario/5.4 - emissions vs base year - netzero 1.5C 50% adjsuted -  extraction.xlsx', index = False)
 
 
 # --------------
 # population
-df_population.to_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario/5.1 - population - 2020.xlsx', index = False)
+df_population.to_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario/6.1 - population - 2020.xlsx', index = False)
 
 

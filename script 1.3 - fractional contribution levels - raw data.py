@@ -64,61 +64,25 @@ del directory
 # --------------
 # LOAD FRACTIONAL CONTRIBUTION DATA
 
-# STEP 2 --- use the indexes from script 1.1 to load and filter all files
+# STEP 3 --- combine all files
 
 # load indexes from previous step
-with open("2 - output/script 1.1 - fractional contribution levels - raw data/indices.json") as f:
-    indices = json.load(f)
-
-
-# Convert the indices list into a set to ensure unique values 
-length = len(indices) # This stores the length of the indices list
-indices = set(indices) # Converts the indices list into a set to ensure unique values
-assert len(indices) == length # This ensures that no indices were duplicated by converting the list to a set
-
-
-# Define the file paths
-file_paths = [
-    "1 - input/1 - fractional contribution/GBD-MAPS_Gridded_Fractional_Contributions_LatLon.csv",
-    "1 - input/1 - fractional contribution/GBD-MAPS_Gridded_Fractional_Contributions_INDcoal.csv",
-    "1 - input/1 - fractional contribution/GBD-MAPS_Gridded_Fractional_Contributions_INDother.csv",
+files = [
+    "GBD-MAPS_Gridded_Fractional_Contributions_LatLon",
+    "GBD-MAPS_Gridded_Fractional_Contributions_INDcoal",
+    "GBD-MAPS_Gridded_Fractional_Contributions_INDother"
 ]
 
-
-# Set chunk size and output folder
-chunk_size = 100_000
-output_folder = "2 - output/script 1.2 - fractional contribution levels - raw data/"
+# load the files
+dfs = [pd.read_csv("2 - output/script 1.2 - fractional contribution levels - raw data/" + fname + "_reduced.csv", index_col=None) for fname in files]
 
 
-# Iterate over each file to process
-for file_path in file_paths:
-    
-    # Set chunk number and header tracking
-    chunk_num = 0
-    first_chunk = True  # Write the header only once per file
-    
-    # Create the output file path
-    output_file = os.path.join(output_folder, os.path.basename(file_path).replace(".csv", "_reduced.csv"))
-    
-    print(f"Processing file: {file_path}")
-    
-    # Process the file in chunks
-    for chunk in pd.read_csv(file_path, chunksize=chunk_size):
-        # Filter data by index
-        filtered = chunk[chunk.index.isin(indices)]
-        
-        # If the filtered chunk has data, write to the output CSV
-        if not filtered.empty:
-            filtered.to_csv(output_file, mode='a', index=False, header=first_chunk)
-            first_chunk = False  # Ensure the header is written only once
+# combine into a singe datarame
+df = pd.concat(dfs, axis=1)
 
-        # Print the chunk number only every 1000 chunks
-        chunk_num += 1
-        if chunk_num % 1000 == 0:
-            print(f"Processed chunk {chunk_num} for {os.path.basename(file_path)}")
 
-    print(f"Finished processing file: {file_path}")
-
+# export
+df.to_csv("2 - output/script 1.2 - fractional contribution levels - raw data/combined_ind.csv")
 
 
 
