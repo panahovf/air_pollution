@@ -1,6 +1,6 @@
 # In[1]:
 # Date: Sep 2, 2024
-# Project: Identify mortality rates based on response function to PM levels and share of mortality attibuted to PM
+# Project: Identify economic benefit from reduced air pollution
 # Author: Farhad Panahov
 
 
@@ -285,17 +285,7 @@ df_annual_mortality_nz_total = pd.merge(df_annual_mortality_nz_total, df_pop_pro
 df_annual_mortality_nz_total[list_of_columns] = df_annual_mortality_nz_total[list_of_columns].multiply(df_annual_mortality_nz_total['100K population'], axis=0)   # multiply rates per 100K to 100K population count
 
 
-# --------------
-# mortality without population growth
-df_annual_mortality_cp_total_nopopgrowth = df_annual_mortalityrate_cp_total.copy()
-df_annual_mortality_nz_total_nopopgrowth = df_annual_mortalityrate_nz_total.copy()
 
-# current population estimate
-val_population_2024 = df_pop_project.loc[df_pop_project['Year'] == 2024, '100K population'].values[0]
-
-# multiple death per 100K to population values (1ooK count)
-df_annual_mortality_cp_total_nopopgrowth[list_of_columns] = df_annual_mortality_cp_total_nopopgrowth[list_of_columns].multiply(val_population_2024, axis=0)   # multiply rates per 100K to 100K population count
-df_annual_mortality_nz_total_nopopgrowth[list_of_columns] = df_annual_mortality_nz_total_nopopgrowth[list_of_columns].multiply(val_population_2024, axis=0)   # multiply rates per 100K to 100K population count
 
 
 
@@ -332,10 +322,6 @@ df_annual_mortalityrate_nz_total.to_excel('2 - output/script 3.2 - mortality - b
 df_annual_mortality_cp_total.to_excel('2 - output/script 3.2 - mortality - by scenario and disease - 2020-50 annual/5.1.1 - annual mortality - current policy.xlsx', index = False)
 df_annual_mortality_nz_total.to_excel('2 - output/script 3.2 - mortality - by scenario and disease - 2020-50 annual/5.2.1 - annual mortality - NZ 1.5C 50%.xlsx', index = False)
 
-
-# mortality - annual result - no population growth
-df_annual_mortality_cp_total_nopopgrowth.to_excel('2 - output/script 3.2 - mortality - by scenario and disease - 2020-50 annual/6.1.1 - annual mortality - no pop growth - current policy.xlsx', index = False)
-df_annual_mortality_nz_total_nopopgrowth.to_excel('2 - output/script 3.2 - mortality - by scenario and disease - 2020-50 annual/6.2.1 - annual mortality - no pop growth - NZ 1.5C 50%.xlsx', index = False)
 
 
 
