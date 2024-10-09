@@ -42,13 +42,11 @@ del directory
 
 
 # --------------
-# LOAD SCRIPT 1.1 DATA
+# LOAD SCRIPT DATA 2.1 (version 2)
 
-
-
-
-
-
+# change columd name
+df_concentration_cp_total.rename(columns={"CP_2050": "2050"}, inplace=True)
+df_concentration_nz_total.rename(columns={"NZ_2050": "2050"}, inplace=True)
 
 
 
@@ -67,9 +65,22 @@ del directory
 
 sns.set_theme(style="ticks")
 
+
+# FIND RANGE FOR CONCETRATION LEVELS
+# Calculate the mean and standard deviation for 'concentration'
+mean_concentration = df_concentration_cp_total['concentration'].mean()
+std_concentration = df_concentration_cp_total['concentration'].std()
+
+# Define the lower and upper bounds using ± standard deviation
+vmin_std = mean_concentration - 1 * std_concentration
+vmax_std = mean_concentration + 1 * std_concentration
+
+# Display the mean, standard deviation, and the derived range
+mean_concentration, std_concentration, vmin_std, vmax_std
+
 # Define the min and max values for the color scale
-vmin = 5  # Set this to your desired minimum value
-vmax = 35  # Set this to your desired maximum value
+vmin = vmin_std  # Set this to your desired minimum value
+vmax = vmax_std  # Set this to your desired maximum value
 
 
 
@@ -79,13 +90,60 @@ vmax = 35  # Set this to your desired maximum value
 ##################### SECTION 1: CURRENT POLICIES ################################################
 ##################################################################################################
 
+
+
+
+# Create a figure with 2 rows and 1 column for the combined top and bottom layout
+fig, axs = plt.subplots(2, 1, figsize=(15, 20), constrained_layout=True)
+
+# Load the world map using GeoPandas
+world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
+
+# Define the scenarios and the dataframes to be used
+scenarios = ["Current Policies", "Net Zero 1.5°C warming *"]
+dataframes = [df_concentration_cp_total, df_concentration_nz_total]
+
+# Iterate over axes, scenarios, and dataframes to plot each
+for ax, scenario, df in zip(axs, scenarios, dataframes):
+    # Plot the world map for context
+    world.plot(ax=ax, color='lightgrey', edgecolor='black')
+
+
+    # Plot the points for PM2.5 concentrations using scatter plot
+    sc = ax.scatter(df['Lon'], df['Lat'],
+                    c=df['2050'], cmap='viridis', s=1,
+                    vmin=5, vmax=35)  # Set vmin and vmax based on reasonable global values
+
+    # Add titles for each subplot
+    ax.set_title(f"{scenario}", fontsize=16, pad=20)
+    ax.set_xlabel("Longitude", fontsize=12)
+    ax.set_ylabel("Latitude", fontsize=12)
+
+# Add a single colorbar to the figure that is shared across both plots
+fig.colorbar(sc, ax=axs, orientation='horizontal', fraction=0.05, pad=0.05, label="PM2.5 Concentration (mg/m$^3$)")
+
+# Add the main title and subtitle
+fig.suptitle('Global PM2.5 Concentration Levels in 2050', fontsize=20, fontweight='bold', y=1.02)
+fig.text(0.5, 0.99, 'Based on NGFS GCAM6 model emissions projections', ha='center', fontsize=12)
+fig.text(0.5, 0.97, '*Annual growth rates from NGFS GCAM6 model are modified to align global cumulative emissions \n with global carbon budget limiting warming to 1.5°C with 50% likelihood', ha='center', fontsize=12)
+
+# Show the combined plot
+plt.show()
+
+
+
+
+
+
+
+
 # --------------
 # 1.1 --- year 2030
 
 # Convert the dataframe to a GeoDataFrame
 gdf_cp_2030 = gpd.GeoDataFrame(
     df_concentration_cp_total, 
-    geometry=gpd.points_from_xy(df_concentration_cp_total.lon2, df_concentration_cp_total.lat2)
+    geometry=gpd.points_from_xy(df_concentration_cp_total.Lon, df_concentration_cp_total.Lat)
 )
 
 # Load a world map from geopandas datasets
@@ -99,12 +157,8 @@ world.plot(ax=ax, color='lightgrey')
 
 # Plot the points on the map with fixed color scale
 gdf_cp_2030.plot(column='CP_2030', ax=ax, legend=True, cmap='viridis', 
-         markersize=50, vmin=vmin, vmax=vmax,
+         markersize=1, vmin=vmin, vmax=vmax,
          legend_kwds={'shrink': 0.5, 'label': "mg/m$^3$", 'orientation': "vertical"})
-
-# Set the limits to zoom into the area around Poland
-ax.set_xlim(10, 30)  # Longitude limits (western and eastern Europe)
-ax.set_ylim(45, 60)  # Latitude limits (central Europe)
 
 # Add titles and labels
 ax.set_title("Poland PM2.5 concentration levels in 2030: Current Policies", fontsize=20, pad=40)
@@ -124,7 +178,7 @@ plt.show()
 # Convert the dataframe to a GeoDataFrame
 gdf_cp_2040 = gpd.GeoDataFrame(
     df_concentration_cp_total, 
-    geometry=gpd.points_from_xy(df_concentration_cp_total.lon2, df_concentration_cp_total.lat2)
+    geometry=gpd.points_from_xy(df_concentration_cp_total.Lon, df_concentration_cp_total.Lat)
 )
 
 # Load a world map from geopandas datasets
@@ -138,12 +192,8 @@ world.plot(ax=ax, color='lightgrey')
 
 # Plot the points on the map with fixed color scale
 gdf_cp_2040.plot(column='CP_2040', ax=ax, legend=True, cmap='viridis', 
-         markersize=50, vmin=vmin, vmax=vmax,
+         markersize=1, vmin=vmin, vmax=vmax,
          legend_kwds={'shrink': 0.5, 'label': "mg/m$^3$", 'orientation': "vertical"})
-
-# Set the limits to zoom into the area around Poland
-ax.set_xlim(10, 30)  # Longitude limits (western and eastern Europe)
-ax.set_ylim(45, 60)  # Latitude limits (central Europe)
 
 # Add titles and labels
 ax.set_title("Poland PM2.5 concentration levels in 2040: Current Policies", fontsize=20, pad=40)
@@ -163,7 +213,7 @@ plt.show()
 # Convert the dataframe to a GeoDataFrame
 gdf_cp_2050 = gpd.GeoDataFrame(
     df_concentration_cp_total, 
-    geometry=gpd.points_from_xy(df_concentration_cp_total.lon2, df_concentration_cp_total.lat2)
+    geometry=gpd.points_from_xy(df_concentration_cp_total.Lon, df_concentration_cp_total.Lat)
 )
 
 # Load a world map from geopandas datasets
@@ -177,12 +227,8 @@ world.plot(ax=ax, color='lightgrey')
 
 # Plot the points on the map with fixed color scale
 gdf_cp_2050.plot(column='CP_2050', ax=ax, legend=True, cmap='viridis', 
-         markersize=50, vmin=vmin, vmax=vmax,
+         markersize=1, vmin=vmin, vmax=vmax,
          legend_kwds={'shrink': 0.5, 'label': "mg/m$^3$", 'orientation': "vertical"})
-
-# Set the limits to zoom into the area around Poland
-ax.set_xlim(10, 30)  # Longitude limits (western and eastern Europe)
-ax.set_ylim(45, 60)  # Latitude limits (central Europe)
 
 # Add titles and labels
 ax.set_title("Poland PM2.5 concentration levels in 2050: Current Policies", fontsize=20, pad=40)
@@ -211,7 +257,7 @@ plt.show()
 # Convert the dataframe to a GeoDataFrame
 gdf_nz_2030 = gpd.GeoDataFrame(
     df_concentration_nz_total, 
-    geometry=gpd.points_from_xy(df_concentration_nz_total.lon2, df_concentration_nz_total.lat2)
+    geometry=gpd.points_from_xy(df_concentration_nz_total.Lon, df_concentration_nz_total.Lat)
 )
 
 # Load a world map from geopandas datasets
@@ -225,12 +271,9 @@ world.plot(ax=ax, color='lightgrey')
 
 # Plot the points on the map with fixed color scale
 gdf_nz_2030.plot(column='NZ_2030', ax=ax, legend=True, cmap='viridis', 
-         markersize=50, vmin=vmin, vmax=vmax,
+         markersize=1, vmin=vmin, vmax=vmax,
          legend_kwds={'shrink': 0.5, 'label': "mg/m$^3$", 'orientation': "vertical"})
 
-# Set the limits to zoom into the area around Poland
-ax.set_xlim(10, 30)  # Longitude limits (western and eastern Europe)
-ax.set_ylim(45, 60)  # Latitude limits (central Europe)
 
 # Add titles and labels
 ax.set_title("Poland PM2.5 concentration levels in 2030: Net Zero 1.5°C", fontsize=20, pad=40)
@@ -250,7 +293,7 @@ plt.show()
 # Convert the dataframe to a GeoDataFrame
 gdf_nz_2040 = gpd.GeoDataFrame(
     df_concentration_nz_total, 
-    geometry=gpd.points_from_xy(df_concentration_nz_total.lon2, df_concentration_nz_total.lat2)
+    geometry=gpd.points_from_xy(df_concentration_nz_total.Lon, df_concentration_nz_total.Lat)
 )
 
 # Load a world map from geopandas datasets
@@ -264,12 +307,8 @@ world.plot(ax=ax, color='lightgrey')
 
 # Plot the points on the map with fixed color scale
 gdf_nz_2040.plot(column='NZ_2040', ax=ax, legend=True, cmap='viridis', 
-         markersize=50, vmin=vmin, vmax=vmax,
+         markersize=1, vmin=vmin, vmax=vmax,
          legend_kwds={'shrink': 0.5, 'label': "mg/m$^3$", 'orientation': "vertical"})
-
-# Set the limits to zoom into the area around Poland
-ax.set_xlim(10, 30)  # Longitude limits (western and eastern Europe)
-ax.set_ylim(45, 60)  # Latitude limits (central Europe)
 
 # Add titles and labels
 ax.set_title("Poland PM2.5 concentration levels in 2040: Net Zero 1.5°C", fontsize=20, pad=40)
@@ -289,7 +328,7 @@ plt.show()
 # Convert the dataframe to a GeoDataFrame
 gdf_nz_2050 = gpd.GeoDataFrame(
     df_concentration_nz_total, 
-    geometry=gpd.points_from_xy(df_concentration_nz_total.lon2, df_concentration_nz_total.lat2)
+    geometry=gpd.points_from_xy(df_concentration_nz_total.Lon, df_concentration_nz_total.Lat)
 )
 
 # Load a world map from geopandas datasets
@@ -303,12 +342,8 @@ world.plot(ax=ax, color='lightgrey')
 
 # Plot the points on the map with fixed color scale
 gdf_nz_2050.plot(column='NZ_2050', ax=ax, legend=True, cmap='viridis', 
-         markersize=50, vmin=vmin, vmax=vmax,
+         markersize=1, vmin=vmin, vmax=vmax,
          legend_kwds={'shrink': 0.5, 'label': "mg/m$^3$", 'orientation': "vertical"})
-
-# Set the limits to zoom into the area around Poland
-ax.set_xlim(10, 30)  # Longitude limits (western and eastern Europe)
-ax.set_ylim(45, 60)  # Latitude limits (central Europe)
 
 # Add titles and labels
 ax.set_title("Poland PM2.5 concentration levels in 2050: Net Zero 1.5°C", fontsize=20, pad=40)

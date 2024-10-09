@@ -1,5 +1,5 @@
 # In[1]:
-# Date: Sep 2, 2024
+# Date: Sep 27, 2024
 # Project: Identify mortality rates based on response function to PM levels and share of mortality attibuted to PM
 # Author: Farhad Panahov
 
@@ -42,8 +42,8 @@ del directory
 
 # --------------
 # LOAD CONCENTRATION DATA
-df_concentration_cp = pd.read_excel('2 - output/script 2.5 - air pollution concentration levels - by scenario - turkeye/1.1 - annual concentration levels - current policy.xlsx')
-df_concentration_nz = pd.read_excel('2 - output/script 2.5 - air pollution concentration levels - by scenario - turkeye/1.2 - annual concentration levels - netzero 1.5C 50% adjsuted.xlsx')
+df_concentration_cp = pd.read_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario - global/1.1 - annual concentration levels - current policy.xlsx')
+df_concentration_nz = pd.read_excel('2 - output/script 2.1 - air pollution concentration levels - by scenario - global/1.2 - annual concentration levels - netzero 1.5C 50% adjsuted.xlsx')
 
 
 # --------------
@@ -62,14 +62,13 @@ df_response_t2d = pd.read_csv('1 - input/4 - response functions/pm desease - t2_
 # stroke; tracjeal,bronchus, and lung cancer; diabetes melittus type 2; ischemic heart disease; lower respiratory infections; chronic obstructive pulmonary disease
 # death per 100K
 df_mortality = pd.read_excel('1 - input/mortality rates.xlsx')
-df_mortality = df_mortality[df_mortality['location_name'] == "Türkiye"]
+df_mortality = df_mortality[df_mortality['location_name'] == "Global"]
 
 
 # --------------
 # POPULATION PROJECTION
 # world bank: https://databank.worldbank.org/source/population-estimates-and-projections#
-df_pop_project = pd.read_excel('1 - input/3 - population/wb - population project.xlsx')
-df_pop_project = df_pop_project.loc[df_pop_project['Country Code'] == "TUR"]
+df_pop_project = pd.read_excel('1 - input/3 - population/wb - population project - global.xlsx')
 
 
 
@@ -306,33 +305,33 @@ df_annual_mortality_nz_total_nopopgrowth[list_of_columns] = df_annual_mortality_
 
 # --------------
 # response function - annual result
-df_annual_response_cp_total.to_excel('2 - output/script 3.2.4 - mortality - by scenario and disease - 2020-50 annual - turkeye/1.1.1 - annual response function - current policy.xlsx', index = False)
-df_annual_response_nz_total.to_excel('2 - output/script 3.2.4 - mortality - by scenario and disease - 2020-50 annual - turkeye/1.2.1 - annual response function - NZ 1.5C 50%.xlsx', index = False)
+df_annual_response_cp_total.to_excel('2 - output/script 3.2.0 - mortality - by scenario and disease - 2020-50 annual - global/1.1.1 - annual response function - current policy.xlsx', index = False)
+df_annual_response_nz_total.to_excel('2 - output/script 3.2.0 - mortality - by scenario and disease - 2020-50 annual - global/1.2.1 - annual response function - NZ 1.5C 50%.xlsx', index = False)
 
 
 # share attibution - annual result
-df_annual_share_cp_total.to_excel('2 - output/script 3.2.4 - mortality - by scenario and disease - 2020-50 annual - turkeye/2.1.1 - annual share attribution - current policy.xlsx', index = False)
-df_annual_share_nz_total.to_excel('2 - output/script 3.2.4 - mortality - by scenario and disease - 2020-50 annual - turkeye/2.2.1 - annual share attribution - NZ 1.5C 50%.xlsx', index = False)
+df_annual_share_cp_total.to_excel('2 - output/script 3.2.0 - mortality - by scenario and disease - 2020-50 annual - global/2.1.1 - annual share attribution - current policy.xlsx', index = False)
+df_annual_share_nz_total.to_excel('2 - output/script 3.2.0 - mortality - by scenario and disease - 2020-50 annual - global/2.2.1 - annual share attribution - NZ 1.5C 50%.xlsx', index = False)
 
 
 # share attibution - annual change
-df_annual_share_change_cp_total.to_excel('2 - output/script 3.2.4 - mortality - by scenario and disease - 2020-50 annual - turkeye/3.1.1 - annual share attribution change - current policy.xlsx', index = False)
-df_annual_share_change_nz_total.to_excel('2 - output/script 3.2.4 - mortality - by scenario and disease - 2020-50 annual - turkeye/3.2.1 - annual share attribution change - NZ 1.5C 50%.xlsx', index = False)
+df_annual_share_change_cp_total.to_excel('2 - output/script 3.2.0 - mortality - by scenario and disease - 2020-50 annual - global/3.1.1 - annual share attribution change - current policy.xlsx', index = False)
+df_annual_share_change_nz_total.to_excel('2 - output/script 3.2.0 - mortality - by scenario and disease - 2020-50 annual - global/3.2.1 - annual share attribution change - NZ 1.5C 50%.xlsx', index = False)
 
 
 # mortality rate - annual result
-df_annual_mortalityrate_cp_total.to_excel('2 - output/script 3.2.4 - mortality - by scenario and disease - 2020-50 annual - turkeye/4.1.1 - annual mortality rate - current policy.xlsx', index = False)
-df_annual_mortalityrate_nz_total.to_excel('2 - output/script 3.2.4 - mortality - by scenario and disease - 2020-50 annual - turkeye/4.2.1 - annual mortality rate - NZ 1.5C 50%.xlsx', index = False)
+df_annual_mortalityrate_cp_total.to_excel('2 - output/script 3.2.0 - mortality - by scenario and disease - 2020-50 annual - global/4.1.1 - annual mortality rate - current policy.xlsx', index = False)
+df_annual_mortalityrate_nz_total.to_excel('2 - output/script 3.2.0 - mortality - by scenario and disease - 2020-50 annual - global/4.2.1 - annual mortality rate - NZ 1.5C 50%.xlsx', index = False)
 
 
 # mortality - annual result
-df_annual_mortality_cp_total.to_excel('2 - output/script 3.2.4 - mortality - by scenario and disease - 2020-50 annual - turkeye/5.1.1 - annual mortality - current policy.xlsx', index = False)
-df_annual_mortality_nz_total.to_excel('2 - output/script 3.2.4 - mortality - by scenario and disease - 2020-50 annual - turkeye/5.2.1 - annual mortality - NZ 1.5C 50%.xlsx', index = False)
+df_annual_mortality_cp_total.to_excel('2 - output/script 3.2.0 - mortality - by scenario and disease - 2020-50 annual - global/5.1.1 - annual mortality - current policy.xlsx', index = False)
+df_annual_mortality_nz_total.to_excel('2 - output/script 3.2.0 - mortality - by scenario and disease - 2020-50 annual - global/5.2.1 - annual mortality - NZ 1.5C 50%.xlsx', index = False)
 
 
 # mortality - annual result - no population growth
-df_annual_mortality_cp_total_nopopgrowth.to_excel('2 - output/script 3.2.4 - mortality - by scenario and disease - 2020-50 annual - turkeye/6.1.1 - annual mortality - no pop growth - current policy.xlsx', index = False)
-df_annual_mortality_nz_total_nopopgrowth.to_excel('2 - output/script 3.2.4 - mortality - by scenario and disease - 2020-50 annual - turkeye/6.2.1 - annual mortality - no pop growth - NZ 1.5C 50%.xlsx', index = False)
+df_annual_mortality_cp_total_nopopgrowth.to_excel('2 - output/script 3.2.0 - mortality - by scenario and disease - 2020-50 annual - global/6.1.1 - annual mortality - no pop growth - current policy.xlsx', index = False)
+df_annual_mortality_nz_total_nopopgrowth.to_excel('2 - output/script 3.2.0 - mortality - by scenario and disease - 2020-50 annual - global/6.2.1 - annual mortality - no pop growth - NZ 1.5C 50%.xlsx', index = False)
 
 
 

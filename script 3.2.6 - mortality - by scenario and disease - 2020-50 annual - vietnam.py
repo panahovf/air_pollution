@@ -61,7 +61,8 @@ df_response_t2d = pd.read_csv('1 - input/4 - response functions/pm desease - t2_
 # https://vizhub.healthdata.org/gbd-results/
 # stroke; tracjeal,bronchus, and lung cancer; diabetes melittus type 2; ischemic heart disease; lower respiratory infections; chronic obstructive pulmonary disease
 # death per 100K
-df_mortality = pd.read_csv('1 - input/IHME-GBD_2021_DATA-443819b9-1.csv')
+df_mortality = pd.read_excel('1 - input/mortality rates.xlsx')
+df_mortality = df_mortality[df_mortality['location_name'] == "Viet Nam"]
 
 
 # --------------
@@ -112,20 +113,20 @@ df_annual_response_cp_total = df_concentration_cp.copy()
 
 
 # df_annual_response_cp_total
-df_annual_response_cp_total = pd.merge(df_annual_response_cp_total, df_response_ihd[['exposure', 'mean']], left_on='total_fossil', right_on='exposure', how='left')
-df_annual_response_cp_total = pd.merge(df_annual_response_cp_total, df_response_copd[['exposure', 'mean']], left_on='total_fossil', right_on='exposure', how='left')
-df_annual_response_cp_total = pd.merge(df_annual_response_cp_total, df_response_lri[['exposure', 'mean']], left_on='total_fossil', right_on='exposure', how='left')
+df_annual_response_cp_total = pd.merge(df_annual_response_cp_total, df_response_ihd[['exposure', 'lower']], left_on='total_fossil', right_on='exposure', how='left')
+df_annual_response_cp_total = pd.merge(df_annual_response_cp_total, df_response_copd[['exposure', 'lower']], left_on='total_fossil', right_on='exposure', how='left')
+df_annual_response_cp_total = pd.merge(df_annual_response_cp_total, df_response_lri[['exposure', 'lower']], left_on='total_fossil', right_on='exposure', how='left')
 
 df_annual_response_cp_total.drop(columns=['exposure', 'exposure_x', 'exposure_y'], inplace=True)   ### this step just renames columns, otherwise you get an error
-df_annual_response_cp_total.rename(columns={'mean_x': 'ihd', 'mean_y': 'copd', 'mean': 'lri'}, inplace=True)
+df_annual_response_cp_total.rename(columns={'lower_x': 'ihd', 'lower_y': 'copd', 'lower': 'lri'}, inplace=True)
 
 
-df_annual_response_cp_total = pd.merge(df_annual_response_cp_total, df_response_lung[['exposure', 'mean']], left_on='total_fossil', right_on='exposure', how='left')
-df_annual_response_cp_total = pd.merge(df_annual_response_cp_total, df_response_stroke[['exposure', 'mean']], left_on='total_fossil', right_on='exposure', how='left')
-df_annual_response_cp_total = pd.merge(df_annual_response_cp_total, df_response_t2d[['exposure', 'mean']], left_on='total_fossil', right_on='exposure', how='left')
+df_annual_response_cp_total = pd.merge(df_annual_response_cp_total, df_response_lung[['exposure', 'lower']], left_on='total_fossil', right_on='exposure', how='left')
+df_annual_response_cp_total = pd.merge(df_annual_response_cp_total, df_response_stroke[['exposure', 'lower']], left_on='total_fossil', right_on='exposure', how='left')
+df_annual_response_cp_total = pd.merge(df_annual_response_cp_total, df_response_t2d[['exposure', 'lower']], left_on='total_fossil', right_on='exposure', how='left')
 
 df_annual_response_cp_total.drop(columns=['exposure', 'exposure_x', 'exposure_y'], inplace=True)
-df_annual_response_cp_total.rename(columns={'mean_x': 'lung', 'mean_y': 'stroke', 'mean': 't2d'}, inplace=True)
+df_annual_response_cp_total.rename(columns={'lower_x': 'lung', 'lower_y': 'stroke', 'lower': 't2d'}, inplace=True)
 
 
 
@@ -136,20 +137,20 @@ df_annual_response_nz_total = df_concentration_nz.copy()
 
 
 # df_annual_response_cp_total
-df_annual_response_nz_total = pd.merge(df_annual_response_nz_total, df_response_ihd[['exposure', 'mean']], left_on='total_fossil', right_on='exposure', how='left')
-df_annual_response_nz_total = pd.merge(df_annual_response_nz_total, df_response_copd[['exposure', 'mean']], left_on='total_fossil', right_on='exposure', how='left')
-df_annual_response_nz_total = pd.merge(df_annual_response_nz_total, df_response_lri[['exposure', 'mean']], left_on='total_fossil', right_on='exposure', how='left')
+df_annual_response_nz_total = pd.merge(df_annual_response_nz_total, df_response_ihd[['exposure', 'lower']], left_on='total_fossil', right_on='exposure', how='left')
+df_annual_response_nz_total = pd.merge(df_annual_response_nz_total, df_response_copd[['exposure', 'lower']], left_on='total_fossil', right_on='exposure', how='left')
+df_annual_response_nz_total = pd.merge(df_annual_response_nz_total, df_response_lri[['exposure', 'lower']], left_on='total_fossil', right_on='exposure', how='left')
 
 df_annual_response_nz_total.drop(columns=['exposure', 'exposure_x', 'exposure_y'], inplace=True)   ### this step just renames columns, otherwise you get an error
-df_annual_response_nz_total.rename(columns={'mean_x': 'ihd', 'mean_y': 'copd', 'mean': 'lri'}, inplace=True)
+df_annual_response_nz_total.rename(columns={'lower_x': 'ihd', 'lower_y': 'copd', 'lower': 'lri'}, inplace=True)
 
 
-df_annual_response_nz_total = pd.merge(df_annual_response_nz_total, df_response_lung[['exposure', 'mean']], left_on='total_fossil', right_on='exposure', how='left')
-df_annual_response_nz_total = pd.merge(df_annual_response_nz_total, df_response_stroke[['exposure', 'mean']], left_on='total_fossil', right_on='exposure', how='left')
-df_annual_response_nz_total = pd.merge(df_annual_response_nz_total, df_response_t2d[['exposure', 'mean']], left_on='total_fossil', right_on='exposure', how='left')
+df_annual_response_nz_total = pd.merge(df_annual_response_nz_total, df_response_lung[['exposure', 'lower']], left_on='total_fossil', right_on='exposure', how='left')
+df_annual_response_nz_total = pd.merge(df_annual_response_nz_total, df_response_stroke[['exposure', 'lower']], left_on='total_fossil', right_on='exposure', how='left')
+df_annual_response_nz_total = pd.merge(df_annual_response_nz_total, df_response_t2d[['exposure', 'lower']], left_on='total_fossil', right_on='exposure', how='left')
 
 df_annual_response_nz_total.drop(columns=['exposure', 'exposure_x', 'exposure_y'], inplace=True)
-df_annual_response_nz_total.rename(columns={'mean_x': 'lung', 'mean_y': 'stroke', 'mean': 't2d'}, inplace=True)
+df_annual_response_nz_total.rename(columns={'lower_x': 'lung', 'lower_y': 'stroke', 'lower': 't2d'}, inplace=True)
 
 
 
@@ -199,34 +200,34 @@ df_annual_mortalityrate_nz_total = df_annual_share_change_nz_total.copy()
 
 
 # set initial value as starting point for each disease
-temp = df_mortality.loc[df_mortality['cause_name'] == 'Ischemic heart disease', 'val'].values[0]
+temp = df_mortality.loc[df_mortality['cause_name'] == 'Ischemic heart disease', 'lower'].values[0]
 df_annual_mortalityrate_cp_total.loc[df_annual_mortalityrate_cp_total['Year'] == 2024, 'ihd'] = temp
 df_annual_mortalityrate_nz_total.loc[df_annual_mortalityrate_nz_total['Year'] == 2024, 'ihd'] = temp
 
-temp = df_mortality.loc[df_mortality['cause_name'] == 'Lower respiratory infections', 'val'].values[0]
+temp = df_mortality.loc[df_mortality['cause_name'] == 'Lower respiratory infections', 'lower'].values[0]
 df_annual_mortalityrate_cp_total.loc[df_annual_mortalityrate_cp_total['Year'] == 2024, 'lri'] = temp
 df_annual_mortalityrate_nz_total.loc[df_annual_mortalityrate_nz_total['Year'] == 2024, 'lri'] = temp
 
-temp = df_mortality.loc[df_mortality['cause_name'] == 'Chronic obstructive pulmonary disease', 'val'].values[0]
+temp = df_mortality.loc[df_mortality['cause_name'] == 'Chronic obstructive pulmonary disease', 'lower'].values[0]
 df_annual_mortalityrate_cp_total.loc[df_annual_mortalityrate_cp_total['Year'] == 2024, 'copd'] = temp
 df_annual_mortalityrate_nz_total.loc[df_annual_mortalityrate_nz_total['Year'] == 2024, 'copd'] = temp
 
-temp = df_mortality.loc[df_mortality['cause_name'] == 'Tracheal, bronchus, and lung cancer', 'val'].values[0]
+temp = df_mortality.loc[df_mortality['cause_name'] == 'Tracheal, bronchus, and lung cancer', 'lower'].values[0]
 df_annual_mortalityrate_cp_total.loc[df_annual_mortalityrate_cp_total['Year'] == 2024, 'lung'] = temp
 df_annual_mortalityrate_nz_total.loc[df_annual_mortalityrate_nz_total['Year'] == 2024, 'lung'] = temp
 
-temp = df_mortality.loc[df_mortality['cause_name'] == 'Stroke', 'val'].values[0]
+temp = df_mortality.loc[df_mortality['cause_name'] == 'Stroke', 'lower'].values[0]
 df_annual_mortalityrate_cp_total.loc[df_annual_mortalityrate_cp_total['Year'] == 2024, 'stroke'] = temp
 df_annual_mortalityrate_nz_total.loc[df_annual_mortalityrate_nz_total['Year'] == 2024, 'stroke'] = temp
 
-temp = df_mortality.loc[df_mortality['cause_name'] == 'Diabetes mellitus type 2', 'val'].values[0]
+temp = df_mortality.loc[df_mortality['cause_name'] == 'Diabetes mellitus type 2', 'lower'].values[0]
 df_annual_mortalityrate_cp_total.loc[df_annual_mortalityrate_cp_total['Year'] == 2024, 't2d'] = temp
 df_annual_mortalityrate_nz_total.loc[df_annual_mortalityrate_nz_total['Year'] == 2024, 't2d'] = temp
 
 
 ### CP
 # get annual mortality rates based on growth rate in disease attribution
-for column in df_annual_mortalityrate_cp_total.columns[2:]:
+for column in df_annual_mortalityrate_cp_total.columns[4:]:
     # Start from 2025 since 2024 is the base year
     for i in range(1, len(df_annual_mortalityrate_cp_total)):
         df_annual_mortalityrate_cp_total.loc[i, column] = df_annual_mortalityrate_cp_total.loc[i - 1, column] * (1 + df_annual_mortalityrate_cp_total.loc[i, column] / 100)
@@ -234,7 +235,7 @@ for column in df_annual_mortalityrate_cp_total.columns[2:]:
 
 ### NZ
 # get annual mortality rates based on growth rate in disease attribution
-for column in df_annual_mortalityrate_nz_total.columns[2:]:
+for column in df_annual_mortalityrate_nz_total.columns[4:]:
     # Start from 2025 since 2024 is the base year
     for i in range(1, len(df_annual_mortalityrate_nz_total)):
         df_annual_mortalityrate_nz_total.loc[i, column] = df_annual_mortalityrate_nz_total.loc[i - 1, column] * (1 + df_annual_mortalityrate_nz_total.loc[i, column] / 100)
