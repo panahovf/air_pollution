@@ -281,7 +281,7 @@ plot_country(ax_vnm, df_vietnam, 'Vietnam', 'upper left')
 fig.suptitle('PM 2.5 Concentration Levels', fontsize=16, fontweight='bold', y=0.98)
 
 # Subtitle
-fig.text(0.5, 0.92, 'Polluction levels are estimated based on NGFS GCAM6 model projections', ha='center', fontsize=12)
+fig.text(0.5, 0.92, 'Pollution levels are estimated based on NGFS GCAM6 model projections', ha='center', fontsize=12)
 fig.text(0.5, 0.88, 'Solid lines are population weighted averages of 1 x 1 km grid values; dashed lines are simple arithmetic averages', ha='center', fontsize=12)
 fig.text(0.5, 0.82, '*Annual growth rates from NGFS GCAM6 model are modified to align global cumulative emissions \n with global carbon budget limiting warming to 1.5°C with 50% likelihood', ha='center', fontsize=12)
 

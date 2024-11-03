@@ -700,3 +700,6 @@ df_nz_power_reduction.to_excel('2 - output/script 2.6 - air pollution concentrat
 df_population.to_excel('2 - output/script 2.6 - air pollution concentration levels - by scenario - usa/6.1 - population - 2020 - unfiltered.xlsx', index = False)
 
 
+# --------------
+# grid level NZ
+df_concentration_nz_total.to_excel('2 - output/script 2.6 - air pollution concentration levels - by scenario - usa/7.1 - concentration level - netzero 1.5C 50% adjusted - grid level.xlsx', index = False)

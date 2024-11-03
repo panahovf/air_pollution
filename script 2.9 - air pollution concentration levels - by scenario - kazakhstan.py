@@ -63,8 +63,8 @@ del directory
 
 # --------------
 # LOAD FRACTIONAL CONTRIBUTION DATA
-df_frac_contribution = pd.read_csv('1 - input/1 - fractional contribution/fractional contribution - indonesia.csv')
-
+df_frac_contribution = pd.read_csv('2 - output/script 1.1.1 - fractional distribution - global - country specified/1.1 - frac dist - global - by country.csv')
+df_frac_contribution = df_frac_contribution[df_frac_contribution['GU_A3'] == "KAZ"]
 
 
 # --------------
@@ -146,7 +146,7 @@ df_frac_contribution = pd.read_csv('1 - input/1 - fractional contribution/fracti
 # print(df_frac_contribution_vnm['Lon'].max()) # -109.335
 # print(df_frac_contribution_vnm['Lon'].min()) # 102.175
 }
-df_concentration_baseline = pd.read_csv('1 - input/2 - concentration levels/concentration levels - indonesia.csv')
+df_concentration_baseline = pd.read_csv('1 - input/2 - concentration levels/concentration levels - global.csv')
 
 
 
@@ -185,8 +185,8 @@ df_nz_power = pd.read_excel(r'C:\Users\panah\OneDrive\Desktop\Work\2 - RA - Clim
 year_columns = [str(year) for year in range(2024, 2051)]
 
 
-df_cp_power = df_cp_power.loc[df_cp_power['Region'] == "IDN"]
-df_nz_power = df_nz_power.loc[df_nz_power['Region'] == "IDN"]
+df_cp_power = df_cp_power.loc[df_cp_power['Region'] == "KAZ"]
+df_nz_power = df_nz_power.loc[df_nz_power['Region'] == "KAZ"]
 
 
 
@@ -245,6 +245,7 @@ del df_cp_power, df_nz_power
 # In[4]: COMBINE FRACTION CONTRUBITIONS AND CONCENTRATION
 #####################################
 
+
 # --------------
 # create 2 digit decimal for fractional dataframe to math concentration dataframe
 # truncate in fraction due to number stucture
@@ -252,42 +253,46 @@ df_frac_contribution['lat2'] = np.trunc(df_frac_contribution['Lat']*100)/100
 df_frac_contribution['lon2'] = np.trunc(df_frac_contribution['Lon']*100)/100
 
 # round in concentration due to number structure
-df_concentration_baseline['X'] = df_concentration_baseline['X'].round(2)
-df_concentration_baseline['Y'] = df_concentration_baseline['Y'].round(2)
+df_concentration_baseline['field_1'] = df_concentration_baseline['field_1'].round(2)
+df_concentration_baseline['field_2'] = df_concentration_baseline['field_2'].round(2)
 
 
 # filter fraction data to match concentration data
-df_frac_contribution = df_frac_contribution[df_frac_contribution['lat2'].isin(df_concentration_baseline['Y'])]
-df_frac_contribution = df_frac_contribution[df_frac_contribution['lon2'].isin(df_concentration_baseline['X'])]
+df_frac_contribution = df_frac_contribution[df_frac_contribution['lat2'].isin(df_concentration_baseline['field_2'])]
+df_frac_contribution = df_frac_contribution[df_frac_contribution['lon2'].isin(df_concentration_baseline['field_1'])]
+
+
+
 
 
 # --------------
 # merge these 2 dataframes
 # NZ
-df_concentration_nz = pd.merge(df_frac_contribution, df_concentration_baseline[['X', 'Y', 'field_3']],
-                     left_on=['lat2', 'lon2'], right_on=['Y', 'X'], how='left')
+df_concentration_nz = pd.merge(df_frac_contribution, df_concentration_baseline[['field_1', 'field_2', 'field_3']],
+                     left_on=['lat2', 'lon2'], right_on=['field_2', 'field_1'], how='left')
 
-df_concentration_nz = df_concentration_nz.drop(columns=['X', 'Y', 'Lon', 'Lat'])
+df_concentration_nz = df_concentration_nz.drop(columns=['field_1', 'field_2', 'Lon', 'Lat'])
 df_concentration_nz.rename(columns={'field_3': 'Current_level'}, inplace=True)
 
 
 # CP
-df_concentration_cp = pd.merge(df_frac_contribution, df_concentration_baseline[['X', 'Y', 'field_3']],
-                     left_on=['lat2', 'lon2'], right_on=['Y', 'X'], how='left')
+df_concentration_cp = pd.merge(df_frac_contribution, df_concentration_baseline[['field_1', 'field_2', 'field_3']],
+                     left_on=['lat2', 'lon2'], right_on=['field_2', 'field_1'], how='left')
 
-df_concentration_cp = df_concentration_cp.drop(columns=['X', 'Y', 'Lon', 'Lat'])
+df_concentration_cp = df_concentration_cp.drop(columns=['field_1', 'field_2', 'Lon', 'Lat'])
 df_concentration_cp.rename(columns={'field_3': 'Current_level'}, inplace=True)
 
 
 # MAX
-df_concentration_max = pd.merge(df_frac_contribution, df_concentration_baseline[['X', 'Y', 'field_3']],
-                     left_on=['lat2', 'lon2'], right_on=['Y', 'X'], how='left')
+df_concentration_max = pd.merge(df_frac_contribution, df_concentration_baseline[['field_1', 'field_2', 'field_3']],
+                     left_on=['lat2', 'lon2'], right_on=['field_2', 'field_1'], how='left')
 
-df_concentration_max = df_concentration_max.drop(columns=['X', 'Y',  'Lon', 'Lat'])
+df_concentration_max = df_concentration_max.drop(columns=['field_1', 'field_2',  'Lon', 'Lat'])
 df_concentration_max.rename(columns={'field_3': 'Current_level'}, inplace=True)
 
 # delete
 del df_concentration_baseline, df_frac_contribution
+
 
 
 
@@ -446,52 +451,9 @@ def map_to_nearest_increment_lat(value, increments_lat):
 # In[4]: NOW LOAD AND FILTER EACH POPULATION DATAFILE RIGHT AWAY
 ################################################################
 
-# here as we load population data files, we filter them right by :
-    # 1: rounding to 2 digit level with increments matching values from 'concentration data'
-    # 2: grouping by --- that is summing population values across rounded grids
-
-population_path = r'C:\Users\panah\OneDrive\Desktop\Work\3 - RA - Air pollution\1 - input\3 - population\2 - indonesia\output_excel'
-population_files = os.listdir(population_path)
 
 
-# create empty population file
-df_population = pd.DataFrame()
-
-
-# loop through each populatino file, filter right away and combine
-for file in population_files:
-    
-    file_path = os.path.join(population_path, file)
-    temp_df = pd.read_excel(file_path)
-   
-   # Apply mapping functions to columns
-    temp_df['lon2'] = temp_df['X'].apply(lambda x: map_to_nearest_increment_lon(x, increments_lon))
-    temp_df['lat2'] = temp_df['Y'].apply(lambda x: map_to_nearest_increment_lat(x, increments_lat))
-    
-    # group by grid (since now grid is aggregated to higher level --- larger area) & rename
-    temp_df = temp_df.groupby(['lon2', 'lat2'])['Value'].sum().reset_index()
-    temp_df.rename(columns={'Value': 'population'}, inplace=True)
-
-    # Add the processed DataFrame to the cumulative DataFrame
-    df_population = pd.concat([df_population, temp_df], ignore_index=True)
-    
-    # print progress
-    print("Finished file " + file)
-
-
-# delete
-del increments_lat, increments_lon
-del population_files, population_path, temp_df, file, file_path
-
-
-# group by lat log and sum population --- in case lon lat were repetitive in different file batches
-df_population = df_population.groupby(['lon2', 'lat2'])['population'].sum().reset_index()
-
-
-# print
-print(df_population['population'].sum())
-# 355440918.0479381
-
+df_population = pd.read_csv('2 - output/script 1.3 - population - global/1.3 - population - global.csv')
 
 
 
@@ -501,21 +463,21 @@ print(df_population['population'].sum())
 
 # --------------
 # keep only common pairs of lat long
-df_concentration_nz_coal_power = pd.merge(df_concentration_nz_coal_power, df_population, on=['lat2', 'lon2'], how='inner')
-df_concentration_nz_oilgas_power = pd.merge(df_concentration_nz_oilgas_power, df_population, on=['lat2', 'lon2'], how='inner')
-df_concentration_nz_total = pd.merge(df_concentration_nz_total, df_population, on=['lat2', 'lon2'], how='inner')
+df_concentration_nz_coal_power = pd.merge(df_concentration_nz_coal_power, df_population, left_on=['lat2', 'lon2'], right_on=['Lat', 'Lon'], how='inner')
+df_concentration_nz_oilgas_power = pd.merge(df_concentration_nz_oilgas_power, df_population, left_on=['lat2', 'lon2'], right_on=['Lat', 'Lon'], how='inner')
+df_concentration_nz_total = pd.merge(df_concentration_nz_total, df_population, left_on=['lat2', 'lon2'], right_on=['Lat', 'Lon'], how='inner')
 
-df_concentration_cp_coal_power = pd.merge(df_concentration_cp_coal_power, df_population, on=['lat2', 'lon2'], how='inner')
-df_concentration_cp_oilgas_power = pd.merge(df_concentration_cp_oilgas_power, df_population, on=['lat2', 'lon2'], how='inner')
-df_concentration_cp_total = pd.merge(df_concentration_cp_total, df_population, on=['lat2', 'lon2'], how='inner')
+df_concentration_cp_coal_power = pd.merge(df_concentration_cp_coal_power, df_population, left_on=['lat2', 'lon2'], right_on=['Lat', 'Lon'], how='inner')
+df_concentration_cp_oilgas_power = pd.merge(df_concentration_cp_oilgas_power, df_population, left_on=['lat2', 'lon2'], right_on=['Lat', 'Lon'], how='inner')
+df_concentration_cp_total = pd.merge(df_concentration_cp_total, df_population, left_on=['lat2', 'lon2'], right_on=['Lat', 'Lon'], how='inner')
 
-df_concentration_max_coal_power = pd.merge(df_concentration_max_coal_power, df_population, on=['lat2', 'lon2'], how='inner')
-df_concentration_max_oilgas_power = pd.merge(df_concentration_max_oilgas_power, df_population, on=['lat2', 'lon2'], how='inner')
-df_concentration_max_total = pd.merge(df_concentration_max_total, df_population, on=['lat2', 'lon2'], how='inner')
+df_concentration_max_coal_power = pd.merge(df_concentration_max_coal_power, df_population, left_on=['lat2', 'lon2'], right_on=['Lat', 'Lon'], how='inner')
+df_concentration_max_oilgas_power = pd.merge(df_concentration_max_oilgas_power, df_population, left_on=['lat2', 'lon2'], right_on=['Lat', 'Lon'], how='inner')
+df_concentration_max_total = pd.merge(df_concentration_max_total, df_population, left_on=['lat2', 'lon2'], right_on=['Lat', 'Lon'], how='inner')
 
 # check sum total of population
 print(df_concentration_nz_coal_power['population'].sum())
-# 248865264.4285895
+# 15725174.893383164
 
 
 
@@ -663,43 +625,44 @@ del temp_power_coal, temp_power_oilgas, temp_total
 
 # --------------
 # annual concentration levels
-df_concentration_cp_annual.to_excel('2 - output/script 2.3 - air pollution concentration levels - by scenario - indonesia/1.1 - annual concentration levels - current policy.xlsx', index = False)
-df_concentration_nz_annual.to_excel('2 - output/script 2.3 - air pollution concentration levels - by scenario - indonesia/1.2 - annual concentration levels - netzero 1.5C 50% adjsuted.xlsx', index = False)
-df_concentration_max_annual.to_excel('2 - output/script 2.3 - air pollution concentration levels - by scenario - indonesia/1.3 - annual concentration levels - full shut down.xlsx', index = False)
+df_concentration_cp_annual.to_excel('2 - output/script 2.9 - air pollution concentration levels - by scenario - kazakhstan/1.1 - annual concentration levels - current policy.xlsx', index = False)
+df_concentration_nz_annual.to_excel('2 - output/script 2.9 - air pollution concentration levels - by scenario - kazakhstan/1.2 - annual concentration levels - netzero 1.5C 50% adjsuted.xlsx', index = False)
+df_concentration_max_annual.to_excel('2 - output/script 2.9 - air pollution concentration levels - by scenario - kazakhstan/1.3 - annual concentration levels - full shut down.xlsx', index = False)
 
 
 # --------------
 # annual concentration levels --- by fuel type --- CP
-df_concentration_cp_coal_power.to_excel('2 - output/script 2.3 - air pollution concentration levels - by scenario - indonesia/2.1 - annual concentration levels - current policy - coal - power.xlsx', index = False)
-df_concentration_cp_oilgas_power.to_excel('2 - output/script 2.3 - air pollution concentration levels - by scenario - indonesia/2.3 - annual concentration levels - current policy - oilgas - power.xlsx', index = False)
-df_concentration_cp_total.to_excel('2 - output/script 2.3 - air pollution concentration levels - by scenario - indonesia/2.5 - annual concentration levels - current policy - total fossil.xlsx', index = False)
+df_concentration_cp_coal_power.to_excel('2 - output/script 2.9 - air pollution concentration levels - by scenario - kazakhstan/2.1 - annual concentration levels - current policy - coal - power.xlsx', index = False)
+df_concentration_cp_oilgas_power.to_excel('2 - output/script 2.9 - air pollution concentration levels - by scenario - kazakhstan/2.3 - annual concentration levels - current policy - oilgas - power.xlsx', index = False)
+df_concentration_cp_total.to_excel('2 - output/script 2.9 - air pollution concentration levels - by scenario - kazakhstan/2.5 - annual concentration levels - current policy - total fossil.xlsx', index = False)
 
 
 # --------------
 # annual concentration levels --- by fuel type --- NZ
-df_concentration_nz_coal_power.to_excel('2 - output/script 2.3 - air pollution concentration levels - by scenario - indonesia/3.1 - annual concentration levels - netzero 1.5C 50% adjsuted - coal - power.xlsx', index = False)
-df_concentration_nz_oilgas_power.to_excel('2 - output/script 2.3 - air pollution concentration levels - by scenario - indonesia/3.3 - annual concentration levels - netzero 1.5C 50% adjsuted - oilgas - power.xlsx', index = False)
-df_concentration_nz_total.to_excel('2 - output/script 2.3 - air pollution concentration levels - by scenario - indonesia/3.5 - annual concentration levels - netzero 1.5C 50% adjsuted - total fossil.xlsx', index = False)
+df_concentration_nz_coal_power.to_excel('2 - output/script 2.9 - air pollution concentration levels - by scenario - kazakhstan/3.1 - annual concentration levels - netzero 1.5C 50% adjsuted - coal - power.xlsx', index = False)
+df_concentration_nz_oilgas_power.to_excel('2 - output/script 2.9 - air pollution concentration levels - by scenario - kazakhstan/3.3 - annual concentration levels - netzero 1.5C 50% adjsuted - oilgas - power.xlsx', index = False)
+df_concentration_nz_total.to_excel('2 - output/script 2.9 - air pollution concentration levels - by scenario - kazakhstan/3.5 - annual concentration levels - netzero 1.5C 50% adjsuted - total fossil.xlsx', index = False)
 
 
 # --------------
 # annual concentration levels --- by fuel type --- MAX
-df_concentration_max_coal_power.to_excel('2 - output/script 2.3 - air pollution concentration levels - by scenario - indonesia/4.1 - annual concentration levels - full shut down - coal - power.xlsx', index = False)
-df_concentration_max_oilgas_power.to_excel('2 - output/script 2.3 - air pollution concentration levels - by scenario - indonesia/4.3 - annual concentration levels - full shut down - oilgas - power.xlsx', index = False)
-df_concentration_max_total.to_excel('2 - output/script 2.3 - air pollution concentration levels - by scenario - indonesia/4.5 - annual concentration levels - full shut down - total fossil.xlsx', index = False)
+df_concentration_max_coal_power.to_excel('2 - output/script 2.9 - air pollution concentration levels - by scenario - kazakhstan/4.1 - annual concentration levels - full shut down - coal - power.xlsx', index = False)
+df_concentration_max_oilgas_power.to_excel('2 - output/script 2.9 - air pollution concentration levels - by scenario - kazakhstan/4.3 - annual concentration levels - full shut down - oilgas - power.xlsx', index = False)
+df_concentration_max_total.to_excel('2 - output/script 2.9 - air pollution concentration levels - by scenario - kazakhstan/4.5 - annual concentration levels - full shut down - total fossil.xlsx', index = False)
 
 
 # --------------
 # emissions changes by type
-df_cp_power_reduction.to_excel('2 - output/script 2.3 - air pollution concentration levels - by scenario - indonesia/5.1 - emissions vs base year - current policy -  power.xlsx', index = False)
-df_nz_power_reduction.to_excel('2 - output/script 2.3 - air pollution concentration levels - by scenario - indonesia/5.3 - emissions vs base year - netzero 1.5C 50% adjsuted -  power.xlsx', index = False)
+df_cp_power_reduction.to_excel('2 - output/script 2.9 - air pollution concentration levels - by scenario - kazakhstan/5.1 - emissions vs base year - current policy -  power.xlsx', index = False)
+df_nz_power_reduction.to_excel('2 - output/script 2.9 - air pollution concentration levels - by scenario - kazakhstan/5.3 - emissions vs base year - netzero 1.5C 50% adjsuted -  power.xlsx', index = False)
 
 
 # --------------
 # population
-df_population.to_excel('2 - output/script 2.3 - air pollution concentration levels - by scenario - indonesia/6.1 - population - 2020 - unfiltered.xlsx', index = False)
+df_population.to_excel('2 - output/script 2.9 - air pollution concentration levels - by scenario - kazakhstan/6.1 - population - 2020 - unfiltered.xlsx', index = False)
 
 
 # --------------
 # grid level NZ
-df_concentration_nz_total.to_excel('2 - output/script 2.3 - air pollution concentration levels - by scenario - indonesia/7.1 - concentration level - netzero 1.5C 50% adjusted - grid level.xlsx', index = False)
+df_concentration_nz_total.to_excel('2 - output/script 2.9 - air pollution concentration levels - by scenario - kazakhstan/7.1 - concentration level - netzero 1.5C 50% adjusted - grid level.xlsx', index = False)
+

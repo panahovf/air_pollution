@@ -50,7 +50,10 @@ df_annual_mortality_cp_total_ind = pd.read_excel('2 - output/script 3.2.3 - mort
 df_annual_mortality_cp_total_tur = pd.read_excel('2 - output/script 3.2.4 - mortality - by scenario and disease - 2020-50 annual - turkeye/5.1.1 - annual mortality - current policy.xlsx')
 df_annual_mortality_cp_total_usa = pd.read_excel('2 - output/script 3.2.5 - mortality - by scenario and disease - 2020-50 annual - usa/5.1.1 - annual mortality - current policy.xlsx')
 df_annual_mortality_cp_total_vnm = pd.read_excel('2 - output/script 3.2.6 - mortality - by scenario and disease - 2020-50 annual - vietnam/5.1.1 - annual mortality - current policy.xlsx')
+df_annual_mortality_cp_total_pol = pd.read_excel('2 - output/script 3.2.8 - mortality - by scenario and disease - 2020-50 annual - poland/5.1.1 - annual mortality - current policy.xlsx')
+df_annual_mortality_cp_total_kaz = pd.read_excel('2 - output/script 3.2.9 - mortality - by scenario and disease - 2020-50 annual - kazakhstan/5.1.1 - annual mortality - current policy.xlsx')
 df_annual_mortality_cp_total_glb = pd.read_excel('2 - output/script 3.2.0 - mortality - by scenario and disease - 2020-50 annual - global/5.1.1 - annual mortality - current policy.xlsx')
+df_annual_mortality_cp_total_emde = pd.read_excel('2 - output/script 3.2.10 - mortality - by scenario and disease - 2020-50 annual - emde/5.1.1 - annual mortality - current policy.xlsx')
 
 
 df_annual_mortality_nz_total_deu = pd.read_excel('2 - output/script 3.2.1 - mortality - by scenario and disease - 2020-50 annual - germany/5.2.1 - annual mortality - NZ 1.5C 50%.xlsx')
@@ -59,7 +62,10 @@ df_annual_mortality_nz_total_ind = pd.read_excel('2 - output/script 3.2.3 - mort
 df_annual_mortality_nz_total_tur = pd.read_excel('2 - output/script 3.2.4 - mortality - by scenario and disease - 2020-50 annual - turkeye/5.2.1 - annual mortality - NZ 1.5C 50%.xlsx')
 df_annual_mortality_nz_total_usa = pd.read_excel('2 - output/script 3.2.5 - mortality - by scenario and disease - 2020-50 annual - usa/5.2.1 - annual mortality - NZ 1.5C 50%.xlsx')
 df_annual_mortality_nz_total_vnm = pd.read_excel('2 - output/script 3.2.6 - mortality - by scenario and disease - 2020-50 annual - vietnam/5.2.1 - annual mortality - NZ 1.5C 50%.xlsx')
+df_annual_mortality_nz_total_pol = pd.read_excel('2 - output/script 3.2.8 - mortality - by scenario and disease - 2020-50 annual - poland/5.2.1 - annual mortality - NZ 1.5C 50%.xlsx')
+df_annual_mortality_nz_total_kaz = pd.read_excel('2 - output/script 3.2.9 - mortality - by scenario and disease - 2020-50 annual - kazakhstan/5.2.1 - annual mortality - NZ 1.5C 50%.xlsx')
 df_annual_mortality_nz_total_glb = pd.read_excel('2 - output/script 3.2.0 - mortality - by scenario and disease - 2020-50 annual - global/5.2.1 - annual mortality - NZ 1.5C 50%.xlsx')
+df_annual_mortality_nz_total_emde = pd.read_excel('2 - output/script 3.2.10 - mortality - by scenario and disease - 2020-50 annual - emde/5.2.1 - annual mortality - NZ 1.5C 50%.xlsx')
 
 
 # --------------
@@ -107,13 +113,59 @@ df_vsl_population = df_vsl_population.merge(
 vsl_weighted_average = (df_vsl_population['Age-invariant VSL-Mean'] * df_vsl_population[2019]).sum() / df_vsl_population[2019].sum()
 
 
-# add median value as global value
+# add mean value as global value
 vsl_global_row = pd.DataFrame({'Country - iso3c': ['GLB'], 'Age-invariant VSL-Mean': [vsl_weighted_average]})
 df_vsl = pd.concat([df_vsl, vsl_global_row], ignore_index=True)
 
 
+
+
+
+
+
+# --------------
+# Get list of EMDE countries
+
+# load datasets
+temp_directory = r'C:\Users\panah\OneDrive\Desktop\Work\2 - RA - Climate fin\2 - output\script a - country codes'
+df_country_developing = pd.read_excel(temp_directory + r'\2 - developing.xlsx')
+df_country_emerging = pd.read_excel(temp_directory + r'\3 - emerging.xlsx')
+
+# get and combine lists
+v_countrycodes_developing = list(df_country_developing['alpha-3'].unique())
+v_countrycodes_emerging = list(df_country_emerging['alpha-3'].unique())
+v_countrycodes = v_countrycodes_developing + v_countrycodes_emerging
+
 # delete
-del vsl_global_row, vsl_weighted_average, df_vsl_population, df_population
+del temp_directory, df_country_developing, df_country_emerging, v_countrycodes_developing, v_countrycodes_emerging
+
+
+
+# --------------
+# Merge and get weighted average mortality rates
+
+# filter population for EMDE
+temp_population = df_population[df_population['Country Code'].isin(v_countrycodes)] # filter population for EMDE
+
+
+# merge with mortality
+temp_vsl = pd.merge(df_vsl, temp_population[['Country Code', 2019]], left_on='Country - iso3c', right_on='Country Code', how='inner')
+temp_vsl[2019] = pd.to_numeric(temp_vsl[2019], errors='coerce')
+
+
+vsl_weighted_average_emde = (temp_vsl['Age-invariant VSL-Mean'] * temp_vsl[2019]).sum() / temp_vsl[2019].sum()
+
+
+# add mean value as global value
+vsl_emde_row = pd.DataFrame({'Country - iso3c': ['EMDE'], 'Age-invariant VSL-Mean': [vsl_weighted_average_emde]})
+df_vsl = pd.concat([df_vsl, vsl_emde_row], ignore_index=True)
+
+
+
+
+
+# delete
+del vsl_weighted_average_emde, vsl_global_row, vsl_weighted_average, df_vsl_population, df_population, vsl_emde_row, temp_vsl, temp_population
 
 
 
@@ -126,7 +178,7 @@ del vsl_global_row, vsl_weighted_average, df_vsl_population, df_population
 #####################################
 
 # country names & ilness for loop
-country_codes = ['deu', 'idn', 'ind', 'tur', 'usa', 'vnm', 'glb']
+country_codes = ['deu', 'idn', 'ind', 'tur', 'usa', 'vnm', 'pol', 'kaz', 'glb', 'emde']
 columns_to_sum = ['ihd', 'copd', 'lri', 'lung', 'stroke']
 
 # variable 
@@ -176,11 +228,11 @@ del vsl, df_temp, code, columns_to_sum, country_codes
 #####################################
 
 # Example list of country names
-countries = ['Global', 'Germany', 'Indonesia', 'India', 'Turkiye', 'USA', 'Vietnam']
+countries = ['Global', 'EMDE', 'Germany', 'Indonesia', 'India', 'Türkiye', 'USA', 'Vietnam', 'Poland', 'Kazakhstan']
 
 # List to store country DataFrames (this is just an example; replace with your actual DataFrames)
-country_dfs = [df_econbenefit_glb, df_econbenefit_deu, df_econbenefit_idn, df_econbenefit_ind,
-               df_econbenefit_tur, df_econbenefit_usa, df_econbenefit_vnm]  # Replace df1, df2, etc., with your actual DataFrames
+country_dfs = [df_econbenefit_glb, df_econbenefit_emde, df_econbenefit_deu, df_econbenefit_idn, df_econbenefit_ind,
+               df_econbenefit_tur, df_econbenefit_usa, df_econbenefit_vnm, df_econbenefit_pol, df_econbenefit_kaz]  # Replace df1, df2, etc., with your actual DataFrames
 
 # Initialize an empty list to collect the data
 temp_data_benefit = []
@@ -485,7 +537,10 @@ df_econbenefit_ind.to_excel('2 - output/script 4.1 - economic benefit/1.3 - econ
 df_econbenefit_tur.to_excel('2 - output/script 4.1 - economic benefit/1.4 - econ benefit - turkeye.xlsx', index = False)
 df_econbenefit_usa.to_excel('2 - output/script 4.1 - economic benefit/1.5 - econ benefit - usa.xlsx', index = False)
 df_econbenefit_vnm.to_excel('2 - output/script 4.1 - economic benefit/1.6 - econ benefit - vietnam.xlsx', index = False)
-df_econbenefit_glb.to_excel('2 - output/script 4.1 - economic benefit/1.7 - econ benefit - global.xlsx', index = False)
+df_econbenefit_pol.to_excel('2 - output/script 4.1 - economic benefit/1.7 - econ benefit - poland.xlsx', index = False)
+df_econbenefit_kaz.to_excel('2 - output/script 4.1 - economic benefit/1.8 - econ benefit - kazakhstan.xlsx', index = False)
+df_econbenefit_emde.to_excel('2 - output/script 4.1 - economic benefit/1.9 - econ benefit - emde.xlsx', index = False)
+df_econbenefit_glb.to_excel('2 - output/script 4.1 - economic benefit/1.10 - econ benefit - global.xlsx', index = False)
 
 # --------------
 # overall table
