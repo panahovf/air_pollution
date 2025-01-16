@@ -39,16 +39,16 @@ directory = r'C:\Users\panah\OneDrive\Desktop\Work\3 - RA - Air pollution'
 os.chdir(directory)
 del directory
 
-# ERROR
-# ERROR
-# ERROR
-# ERROR
-# ERROR
+### ERROR
+### ERROR
+### ERROR
+### ERROR
+### ERROR
 # DIRECTORY
 # --------------
 # LOAD CONCENTRATION DATA
-df_concentration_cp = pd.read_excel('2 - output/script 2.8 - air pollution concentration levels - by scenario - poland/1.1 - annual concentration levels - current policy.xlsx')
-df_concentration_nz = pd.read_excel('2 - output/script 2.8 - air pollution concentration levels - by scenario - poland/1.2 - annual concentration levels - netzero 1.5C 50% adjsuted.xlsx')
+df_concentration_cp = pd.read_excel('2 - output/script 2.2 - air pollution concentration levels - by scenario - germany/1.1 - annual concentration levels - current policy.xlsx')
+df_concentration_nz = pd.read_excel('2 - output/script 2.2 - air pollution concentration levels - by scenario - germany/1.2 - annual concentration levels - netzero 1.5C 50% adjsuted.xlsx')
 
 
 # --------------
@@ -66,15 +66,15 @@ df_response_t2d = pd.read_csv('1 - input/4 - response functions/pm desease - t2_
 # https://vizhub.healthdata.org/gbd-results/
 # stroke; tracjeal,bronchus, and lung cancer; diabetes melittus type 2; ischemic heart disease; lower respiratory infections; chronic obstructive pulmonary disease
 # death per 100K
-df_mortality = pd.read_excel('1 - input/mortality rates - by country.xlsx')
-df_mortality = df_mortality[df_mortality['Location'] == "Kazakhstan"]
+df_mortality = pd.read_excel('1 - input/mortality rates.xlsx')
+df_mortality = df_mortality[df_mortality['location_name'] == "China"]
 
 
 # --------------
 # POPULATION PROJECTION
 # world bank: https://databank.worldbank.org/source/population-estimates-and-projections#
-df_pop_project = pd.read_excel('1 - input/3 - population/wb - population project - by country.xlsx')
-df_pop_project = df_pop_project.loc[df_pop_project['Country Code'] == "KAZ"]
+df_pop_project = pd.read_excel('1 - input/3 - population/wb - population project.xlsx')
+df_pop_project = df_pop_project.loc[df_pop_project['Country Code'] == "CHN"]
 
 
 
@@ -205,27 +205,27 @@ df_annual_mortalityrate_nz_total = df_annual_share_change_nz_total.copy()
 
 
 # set initial value as starting point for each disease
-temp = df_mortality.loc[df_mortality['Cause'] == 'Ischemic heart disease', 'Lower'].values[0]
+temp = df_mortality.loc[df_mortality['cause_name'] == 'Ischemic heart disease', 'lower'].values[0]
 df_annual_mortalityrate_cp_total.loc[df_annual_mortalityrate_cp_total['Year'] == 2024, 'ihd'] = temp
 df_annual_mortalityrate_nz_total.loc[df_annual_mortalityrate_nz_total['Year'] == 2024, 'ihd'] = temp
 
-temp = df_mortality.loc[df_mortality['Cause'] == 'Lower respiratory infections', 'Lower'].values[0]
+temp = df_mortality.loc[df_mortality['cause_name'] == 'Lower respiratory infections', 'lower'].values[0]
 df_annual_mortalityrate_cp_total.loc[df_annual_mortalityrate_cp_total['Year'] == 2024, 'lri'] = temp
 df_annual_mortalityrate_nz_total.loc[df_annual_mortalityrate_nz_total['Year'] == 2024, 'lri'] = temp
 
-temp = df_mortality.loc[df_mortality['Cause'] == 'Chronic obstructive pulmonary disease', 'Lower'].values[0]
+temp = df_mortality.loc[df_mortality['cause_name'] == 'Chronic obstructive pulmonary disease', 'lower'].values[0]
 df_annual_mortalityrate_cp_total.loc[df_annual_mortalityrate_cp_total['Year'] == 2024, 'copd'] = temp
 df_annual_mortalityrate_nz_total.loc[df_annual_mortalityrate_nz_total['Year'] == 2024, 'copd'] = temp
 
-temp = df_mortality.loc[df_mortality['Cause'] == 'Tracheal, bronchus, and lung cancer', 'Lower'].values[0]
+temp = df_mortality.loc[df_mortality['cause_name'] == 'Tracheal, bronchus, and lung cancer', 'lower'].values[0]
 df_annual_mortalityrate_cp_total.loc[df_annual_mortalityrate_cp_total['Year'] == 2024, 'lung'] = temp
 df_annual_mortalityrate_nz_total.loc[df_annual_mortalityrate_nz_total['Year'] == 2024, 'lung'] = temp
 
-temp = df_mortality.loc[df_mortality['Cause'] == 'Stroke', 'Lower'].values[0]
+temp = df_mortality.loc[df_mortality['cause_name'] == 'Stroke', 'lower'].values[0]
 df_annual_mortalityrate_cp_total.loc[df_annual_mortalityrate_cp_total['Year'] == 2024, 'stroke'] = temp
 df_annual_mortalityrate_nz_total.loc[df_annual_mortalityrate_nz_total['Year'] == 2024, 'stroke'] = temp
 
-temp = df_mortality.loc[df_mortality['Cause'] == 'Diabetes mellitus type 2', 'Lower'].values[0]
+temp = df_mortality.loc[df_mortality['cause_name'] == 'Diabetes mellitus type 2', 'lower'].values[0]
 df_annual_mortalityrate_cp_total.loc[df_annual_mortalityrate_cp_total['Year'] == 2024, 't2d'] = temp
 df_annual_mortalityrate_nz_total.loc[df_annual_mortalityrate_nz_total['Year'] == 2024, 't2d'] = temp
 
@@ -311,33 +311,33 @@ df_annual_mortality_nz_total_nopopgrowth[list_of_columns] = df_annual_mortality_
 
 # --------------
 # response function - annual result
-df_annual_response_cp_total.to_excel('2 - output/script 3.2.9 - mortality - by scenario and disease - 2020-50 annual - kazakhstan/1.1.1 - annual response function - current policy.xlsx', index = False)
-df_annual_response_nz_total.to_excel('2 - output/script 3.2.9 - mortality - by scenario and disease - 2020-50 annual - kazakhstan/1.2.1 - annual response function - NZ 1.5C 50%.xlsx', index = False)
+df_annual_response_cp_total.to_excel('2 - output/script 3.2.7 - mortality - by scenario and disease - 2020-50 annual - china/1.1.1 - annual response function - current policy.xlsx', index = False)
+df_annual_response_nz_total.to_excel('2 - output/script 3.2.7 - mortality - by scenario and disease - 2020-50 annual - china/1.2.1 - annual response function - NZ 1.5C 50%.xlsx', index = False)
 
 
 # share attibution - annual result
-df_annual_share_cp_total.to_excel('2 - output/script 3.2.9 - mortality - by scenario and disease - 2020-50 annual - kazakhstan/2.1.1 - annual share attribution - current policy.xlsx', index = False)
-df_annual_share_nz_total.to_excel('2 - output/script 3.2.9 - mortality - by scenario and disease - 2020-50 annual - kazakhstan/2.2.1 - annual share attribution - NZ 1.5C 50%.xlsx', index = False)
+df_annual_share_cp_total.to_excel('2 - output/script 3.2.7 - mortality - by scenario and disease - 2020-50 annual - china/2.1.1 - annual share attribution - current policy.xlsx', index = False)
+df_annual_share_nz_total.to_excel('2 - output/script 3.2.7 - mortality - by scenario and disease - 2020-50 annual - china/2.2.1 - annual share attribution - NZ 1.5C 50%.xlsx', index = False)
 
 
 # share attibution - annual change
-df_annual_share_change_cp_total.to_excel('2 - output/script 3.2.9 - mortality - by scenario and disease - 2020-50 annual - kazakhstan/3.1.1 - annual share attribution change - current policy.xlsx', index = False)
-df_annual_share_change_nz_total.to_excel('2 - output/script 3.2.9 - mortality - by scenario and disease - 2020-50 annual - kazakhstan/3.2.1 - annual share attribution change - NZ 1.5C 50%.xlsx', index = False)
+df_annual_share_change_cp_total.to_excel('2 - output/script 3.2.7 - mortality - by scenario and disease - 2020-50 annual - china/3.1.1 - annual share attribution change - current policy.xlsx', index = False)
+df_annual_share_change_nz_total.to_excel('2 - output/script 3.2.7 - mortality - by scenario and disease - 2020-50 annual - china/3.2.1 - annual share attribution change - NZ 1.5C 50%.xlsx', index = False)
 
 
 # mortality rate - annual result
-df_annual_mortalityrate_cp_total.to_excel('2 - output/script 3.2.9 - mortality - by scenario and disease - 2020-50 annual - kazakhstan/4.1.1 - annual mortality rate - current policy.xlsx', index = False)
-df_annual_mortalityrate_nz_total.to_excel('2 - output/script 3.2.9 - mortality - by scenario and disease - 2020-50 annual - kazakhstan/4.2.1 - annual mortality rate - NZ 1.5C 50%.xlsx', index = False)
+df_annual_mortalityrate_cp_total.to_excel('2 - output/script 3.2.7 - mortality - by scenario and disease - 2020-50 annual - china/4.1.1 - annual mortality rate - current policy.xlsx', index = False)
+df_annual_mortalityrate_nz_total.to_excel('2 - output/script 3.2.7 - mortality - by scenario and disease - 2020-50 annual - china/4.2.1 - annual mortality rate - NZ 1.5C 50%.xlsx', index = False)
 
 
 # mortality - annual result
-df_annual_mortality_cp_total.to_excel('2 - output/script 3.2.9 - mortality - by scenario and disease - 2020-50 annual - kazakhstan/5.1.1 - annual mortality - current policy.xlsx', index = False)
-df_annual_mortality_nz_total.to_excel('2 - output/script 3.2.9 - mortality - by scenario and disease - 2020-50 annual - kazakhstan/5.2.1 - annual mortality - NZ 1.5C 50%.xlsx', index = False)
+df_annual_mortality_cp_total.to_excel('2 - output/script 3.2.7 - mortality - by scenario and disease - 2020-50 annual - china/5.1.1 - annual mortality - current policy.xlsx', index = False)
+df_annual_mortality_nz_total.to_excel('2 - output/script 3.2.7 - mortality - by scenario and disease - 2020-50 annual - china/5.2.1 - annual mortality - NZ 1.5C 50%.xlsx', index = False)
 
 
 # mortality - annual result - no population growth
-df_annual_mortality_cp_total_nopopgrowth.to_excel('2 - output/script 3.2.9 - mortality - by scenario and disease - 2020-50 annual - kazakhstan/6.1.1 - annual mortality - no pop growth - current policy.xlsx', index = False)
-df_annual_mortality_nz_total_nopopgrowth.to_excel('2 - output/script 3.2.9 - mortality - by scenario and disease - 2020-50 annual - kazakhstan/6.2.1 - annual mortality - no pop growth - NZ 1.5C 50%.xlsx', index = False)
+df_annual_mortality_cp_total_nopopgrowth.to_excel('2 - output/script 3.2.7 - mortality - by scenario and disease - 2020-50 annual - china/6.1.1 - annual mortality - no pop growth - current policy.xlsx', index = False)
+df_annual_mortality_nz_total_nopopgrowth.to_excel('2 - output/script 3.2.7 - mortality - by scenario and disease - 2020-50 annual - china/6.2.1 - annual mortality - no pop growth - NZ 1.5C 50%.xlsx', index = False)
 
 
 
