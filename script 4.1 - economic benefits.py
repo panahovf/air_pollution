@@ -52,6 +52,9 @@ df_annual_mortality_cp_total_mex = pd.read_excel('2 - output/script 3.2.14 - mor
 df_annual_mortality_cp_total_chn = pd.read_excel('2 - output/script 3.2.10 - mortality - by scenario and disease - 2020-50 annual - china/5.1.1 - annual mortality - current policy.xlsx')
 df_annual_mortality_cp_total_irn = pd.read_excel('2 - output/script 3.2.12 - mortality - by scenario and disease - 2020-50 annual - iran/5.1.1 - annual mortality - current policy.xlsx')
 df_annual_mortality_cp_total_tha = pd.read_excel('2 - output/script 3.2.13 - mortality - by scenario and disease - 2020-50 annual - thailand/5.1.1 - annual mortality - current policy.xlsx')
+df_annual_mortality_cp_total_bgd = pd.read_excel('2 - output/script 3.2.17 - mortality - by scenario and disease - 2020-50 annual - bangladesh/5.1.1 - annual mortality - current policy.xlsx')
+df_annual_mortality_cp_total_egy = pd.read_excel('2 - output/script 3.2.18 - mortality - by scenario and disease - 2020-50 annual - egypt/5.1.1 - annual mortality - current policy.xlsx')
+df_annual_mortality_cp_total_tur = pd.read_excel('2 - output/script 3.2.19 - mortality - by scenario and disease - 2020-50 annual - turkeye/5.1.1 - annual mortality - current policy.xlsx')
 
 df_annual_mortality_cp_total_glb = pd.read_excel('2 - output/script 3.2.0 - mortality - by scenario and disease - 2020-50 annual - global/5.1.1 - annual mortality - current policy.xlsx')
 df_annual_mortality_cp_total_devunfccc = pd.read_excel('2 - output/script 3.2.15 - mortality - by scenario and disease - 2020-50 annual - devunfccc/5.1.1 - annual mortality - current policy.xlsx')
@@ -67,6 +70,9 @@ df_annual_mortality_nz_total_mex = pd.read_excel('2 - output/script 3.2.14 - mor
 df_annual_mortality_nz_total_chn = pd.read_excel('2 - output/script 3.2.10 - mortality - by scenario and disease - 2020-50 annual - china/5.2.1 - annual mortality - NZ 1.5C 50%.xlsx')
 df_annual_mortality_nz_total_irn = pd.read_excel('2 - output/script 3.2.12 - mortality - by scenario and disease - 2020-50 annual - iran/5.2.1 - annual mortality - NZ 1.5C 50%.xlsx')
 df_annual_mortality_nz_total_tha = pd.read_excel('2 - output/script 3.2.13 - mortality - by scenario and disease - 2020-50 annual - thailand/5.2.1 - annual mortality - NZ 1.5C 50%.xlsx')
+df_annual_mortality_nz_total_bgd = pd.read_excel('2 - output/script 3.2.17 - mortality - by scenario and disease - 2020-50 annual - bangladesh/5.2.1 - annual mortality - NZ 1.5C 50%.xlsx')
+df_annual_mortality_nz_total_egy = pd.read_excel('2 - output/script 3.2.18 - mortality - by scenario and disease - 2020-50 annual - egypt/5.2.1 - annual mortality - NZ 1.5C 50%.xlsx')
+df_annual_mortality_nz_total_tur = pd.read_excel('2 - output/script 3.2.19 - mortality - by scenario and disease - 2020-50 annual - turkeye/5.2.1 - annual mortality - NZ 1.5C 50%.xlsx')
 
 df_annual_mortality_nz_total_glb = pd.read_excel('2 - output/script 3.2.0 - mortality - by scenario and disease - 2020-50 annual - global/5.2.1 - annual mortality - NZ 1.5C 50%.xlsx')
 df_annual_mortality_nz_total_devunfccc = pd.read_excel('2 - output/script 3.2.15 - mortality - by scenario and disease - 2020-50 annual - devunfccc/5.2.1 - annual mortality - NZ 1.5C 50%.xlsx')
@@ -191,7 +197,7 @@ del df_vsl_population
 #####################################
 
 # country names & ilness for loop
-country_codes = ['chn', 'idn', 'ind', 'irn', 'mex', 'tha', 'vnm', 'zaf', 'glb', 'dopunfccc', 'devunfccc']
+country_codes = ['chn', 'idn', 'ind', 'irn', 'mex', 'tha', 'vnm', 'zaf', 'egy', 'tur', 'bgd', 'glb', 'dopunfccc', 'devunfccc']
 columns_to_sum = ['ihd', 'copd', 'lri', 'lung', 'stroke']
 
 # variable 
@@ -243,12 +249,14 @@ del vsl, df_temp, code, columns_to_sum, country_codes
 # Example list of country names
 countries = ['Global', 'Developed', 'Developing',
              'China', 'India', 'Indonesia',
-             'South Africa', 'Mexico', 'Viet Nam', 'Iran', 'Thailand']
+             'South Africa', 'Mexico', 'Viet Nam', 'Iran', 'Thailand', 'Egypt',
+             'Bagladesh', 'Türkiye']
 
 # List to store country DataFrames (this is just an example; replace with your actual DataFrames)
 country_dfs = [df_econbenefit_glb, df_econbenefit_dopunfccc, df_econbenefit_devunfccc,
                df_econbenefit_chn, df_econbenefit_ind, df_econbenefit_idn,
-               df_econbenefit_zaf, df_econbenefit_mex, df_econbenefit_vnm, df_econbenefit_irn, df_econbenefit_tha]  # Replace df1, df2, etc., with your actual DataFrames
+               df_econbenefit_zaf, df_econbenefit_mex, df_econbenefit_vnm, df_econbenefit_irn, df_econbenefit_tha,
+               df_econbenefit_egy, df_econbenefit_bgd, df_econbenefit_tur]  # Replace df1, df2, etc., with your actual DataFrames
 
 # Initialize an empty list to collect the data
 temp_data_benefit = []
