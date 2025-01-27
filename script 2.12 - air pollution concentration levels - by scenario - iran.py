@@ -219,15 +219,17 @@ del temp
 # Get CP vs NZ difference: (1-NZ)/Current levels
 # i.e. emissions reduction under NZ as a share of current level
 df_nz_power_reduction = df_nz_power.copy()
-df_nz_power_reduction[year_columns] = 1 - df_nz_power[year_columns].div(df_nz_power['2024'], axis=0)
-
+df_nz_power_reduction[year_columns] = 1 - df_nz_power[year_columns].div(
+    df_nz_power['2024'].fillna(0), axis=0
+).fillna(0)
 
 # --------------
 # Get CP vs NZ difference: (1-CP)/Current levels
 # i.e. emissions reduction under CP as a share of current level
 df_cp_power_reduction = df_cp_power.copy()
-df_cp_power_reduction[year_columns] = 1 - df_cp_power[year_columns].div(df_cp_power['2024'], axis=0)
-
+df_cp_power_reduction[year_columns] = 1 - df_cp_power[year_columns].div(
+    df_cp_power['2024'].fillna(0), axis=0
+).fillna(0)
 
 
 # delete
